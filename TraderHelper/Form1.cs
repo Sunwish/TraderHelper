@@ -76,8 +76,10 @@ namespace TraderHelper
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            if(Get2DisplayShareInfomation(textBox1.Text))
+            if (Get2DisplayShareInfomation(textBox1.Text))
                 this.Text = Formtitle + " (Stock data has update: " + System.DateTime.Now.ToLongDateString() + " " + System.DateTime.Now.ToLongTimeString() + " )";
+            else
+                this.Text = Formtitle + " (Request Error!)";
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)

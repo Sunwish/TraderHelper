@@ -20,23 +20,23 @@ namespace TraderHelper
                 return streamReader.ReadToEnd();
             }
         }
-
+        
         public static System.IO.Stream HttpResponseStream(string url)
         {
             // 创建 HttpWeb 请求并接收相应
             HttpWebRequest httpRequst = WebRequest.Create(url) as HttpWebRequest;
-            using (HttpWebResponse httpResponse = httpRequst.GetResponse() as HttpWebResponse)
-            {
-                // 返回响应流
-                return httpResponse.GetResponseStream();
-            }
+            HttpWebResponse httpResponse = httpRequst.GetResponse() as HttpWebResponse;
+            
+            // 返回响应流
+            return httpResponse.GetResponseStream();
+                            
         }
-
+        
         public static System.Drawing.Image HttpRequestImage(string url)
         {
             // 获取响应流
             using (System.IO.Stream httpStream = HttpResponseStream(url))
-            { 
+            {
                 // 返回图像数据
                 try
                 {
