@@ -58,7 +58,8 @@
             this.textBox2.Location = new System.Drawing.Point(46, 88);
             this.textBox2.Multiline = true;
             this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(436, 208);
+            this.textBox2.ReadOnly = true;
+            this.textBox2.Size = new System.Drawing.Size(301, 208);
             this.textBox2.TabIndex = 2;
             // 
             // label1
@@ -74,7 +75,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(538, 333);
+            this.ClientSize = new System.Drawing.Size(391, 333);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.textBox2);
             this.Controls.Add(this.button1);

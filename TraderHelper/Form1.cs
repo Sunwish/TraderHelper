@@ -28,43 +28,17 @@ namespace TraderHelper
             string shareCode = textBox1.Text;
             string shareType = shareCode.First() == '0' ? "sz" : "sh";
 
-            // Get http response
-            string requestURL = MakeShareResponseURL(httpHeader, shareType, shareCode);
-            string httpResponse;
-            httpResponse = HttpResponse(requestURL, "GB2312");
-
-            // Gain infomation
-            string reg1 = Regexer(@"(?<=.+=.).+(?=,)", httpResponse);
-            string[] shareParams = reg1.Split(',');
-            string paramList = String.Join("-", shareParams);
-
-            if (paramList != "")
-                textBox2.Text = paramList;
-            else
-                textBox2.Text = "信息获取错误";
-        }
-
-        private string MakeShareResponseURL(string urlHeader, string shareType, string shareCode)
-        {
-            return urlHeader + shareType + shareCode;
-        }
-
-        private string HttpResponse(string url, string encoding)
-        {
-            HttpWebRequest httpRequst = WebRequest.Create(url) as HttpWebRequest;
-            HttpWebResponse httpResponse = httpRequst.GetResponse() as HttpWebResponse;
-
-            System.IO.Stream httpStream = httpResponse.GetResponseStream();
-            System.IO.StreamReader streamReader = new System.IO.StreamReader(httpStream, Encoding.GetEncoding(encoding));
-
-            return streamReader.ReadToEnd();
-        }
-        
-        private string Regexer(string regex, string source)
-        {
-            Regex reg = new Regex(regex);
-            Match match = reg.Match(source);
-            return match.ToString();
+            try
+            {
+                Share share = Share.CreateFromShareInfo(ShareInfo.Build(httpHeader, shareType, shareCode));
+                string outputString = "股票名称: " + share.shareData.shareName + "\n现价:" + share.shareData.currentPrice + "\n买一: " + share.shareData.buyPrice[0] + "\n卖一:" + share.shareData.sellPrice[0] + "\n数据时间: " + share.shareData.dataTime;
+                textBox2.Text = outputString.Replace("\n", Environment.NewLine);             
+            }
+            catch(SystemException exception)
+            {
+                textBox2.Text = exception.Message;
+            }
+            
         }
 
         private void textBox1_KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
