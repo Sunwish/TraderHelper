@@ -11,14 +11,17 @@ namespace TraderHelper
         public ShareData shareData;
         public ShareInfo shareInfo;
 
+        // 私有构造
         private Share() { }
 
+        // 构造函数
         public Share(ShareInfo shareInfo, ShareData shareData)
         {
             this.shareInfo = shareInfo;
             this.shareData = shareData;
         }
 
+        // 从shareInfo静态创建一个Share实例
         public static Share CreateFromShareInfo(ShareInfo shareInfo)
         {
             Share share = new Share();
@@ -28,6 +31,7 @@ namespace TraderHelper
             return share;
         }
 
+        // 从shareInfo静态创建一个Share实例
         public static Share CreateFromShareInfo(string shareUrlHeader, string shareUrlType, string shareUrlCode)
         {
             Share share = new Share();
@@ -37,29 +41,31 @@ namespace TraderHelper
             return share;
         }
 
+        // 从指定shareInfo获取最新shareData
         private static ShareData GetShareDataFromShareInfo(ShareInfo shareInfo)
         {
-            // Get http response
+            // 获取http响应
             string requestURL = MakeShareResponseURL(shareInfo.shareUrlHeader, shareInfo.shareUrlType, shareInfo.shareUrlCode);
-            string httpResponse;
-            httpResponse = Helper.HttpResponse(requestURL, "GB2312");
+            string httpResponse = Helper.HttpResponse(requestURL, "GB2312");
 
-            // Gain infomation
+            // 取响应流有效信息
             string reg1 = Helper.Regexer(@"(?<=.+=.).+(?=,)", httpResponse);
             string[] shareParams = reg1.Split(',');
             ShareData shareData = new TraderHelper.ShareData(shareParams);
 
-            if (shareParams.Length == 1)
+            if (shareParams.Length == 1) // 获取信息为空
                 throw new SystemException("[Exception] UpdateShareDataFromShareInfo: 信息获取错误;");
 
             return shareData;
         }
 
+        // 从自身shareInfo获取最新ShareData
         private ShareData GetShareDataFromShareInfo()
         {
             return GetShareDataFromShareInfo(this.shareInfo);
         }
 
+        // 组合请求URL
         private static string MakeShareResponseURL(string urlHeader, string shareType, string shareCode)
         {
             return urlHeader + shareType + shareCode;
@@ -72,6 +78,7 @@ namespace TraderHelper
         public string shareUrlType;
         public string shareUrlCode;
 
+        // 构造函数
         public ShareInfo(string shareUrlHeader, string shareUrlType, string shareUrlCode)
         {
             this.shareUrlHeader = shareUrlHeader;
@@ -79,6 +86,7 @@ namespace TraderHelper
             this.shareUrlCode = shareUrlCode;
         }
 
+        // 构造函数
         public ShareInfo(ShareInfo shareInfo)
         {
             this.shareUrlHeader = shareInfo.shareUrlHeader;
@@ -86,11 +94,13 @@ namespace TraderHelper
             this.shareUrlCode = shareInfo.shareUrlCode;
         }
 
+        // 静态构建 ShareInfo
         public static ShareInfo Build(string shareUrlHeader, string shareUrlType, string shareUrlCode)
         {
             return new ShareInfo(shareUrlHeader, shareUrlType, shareUrlCode);
         }
 
+        // 静态构建 ShareInfo
         public static ShareInfo Build(ShareInfo shareInfo)
         {
             return new ShareInfo(shareInfo);
@@ -100,18 +110,19 @@ namespace TraderHelper
 
     class ShareData
     {
-        public string shareName;
-        public string openingPriceToday;
-        public string closingPriceYestday;
-        public string currentPrice;
-        public string highestPriceToday;
-        public string lowestPriceToday;
-        public string[] buyPrice;
-        public string[] sellPrice;
-        public string[] buyAmount;
-        public string[] sellAmount;
-        public string dataTime;
+        public string shareName; // 股票名称
+        public string openingPriceToday; // 今日开盘价
+        public string closingPriceYestday; // 昨日收盘价
+        public string currentPrice; // 现价
+        public string highestPriceToday; // 今日最高价
+        public string lowestPriceToday; // 今日最低价
+        public string[] buyPrice; // 买价(买一~买五)
+        public string[] sellPrice; // 卖价(卖一~卖五)
+        public string[] buyAmount; // 买数量(买一~买五)
+        public string[] sellAmount; // 买数量(买一~买五)
+        public string dataTime; // 数据来源时间
 
+        // 构造函数
         public ShareData (string[] shareParams)
         {
             if (shareParams.Length < 32)
@@ -129,6 +140,7 @@ namespace TraderHelper
             this.dataTime = shareParams[31];
         }
 
+        // 构造函数
         public ShareData(ShareData shareData)
         {
             this.shareName = shareData.shareName;
@@ -144,11 +156,13 @@ namespace TraderHelper
             this.dataTime = shareData.dataTime;
         }
 
+        // 静态构建 ShareData
         public static ShareData Build(string[] shareParams)
         {
             return new ShareData(shareParams);
         }
 
+        // 静态构建 ShareData
         public static ShareData Build(ShareData shareData)
         {
             return new ShareData(shareData);
