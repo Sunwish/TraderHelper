@@ -13,11 +13,23 @@ namespace TraderHelper
 {
     public partial class Form1 : Form
     {
-
+        const string Formtitle = "Trader Helper";
+        Timer timer = new Timer();
+        
         public Form1()
         {
             InitializeComponent();
             textBox1.KeyPress += textBox1_KeyPress;
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            Get2DisplayShareInfomation(textBox1.Text);
+
+            // Set timer to update stock data automatically
+            timer.Interval = 1000;
+            timer.Tick += Timer_Tick;
+            timer.Start();
         }
 
         private bool Get2DisplayShareInfomation(string code)
@@ -60,12 +72,12 @@ namespace TraderHelper
                     e.Handled = true;
                 }
             }
-            
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void Timer_Tick(object sender, EventArgs e)
         {
-            Get2DisplayShareInfomation(textBox1.Text);
+            if(Get2DisplayShareInfomation(textBox1.Text))
+                this.Text = Formtitle + " (Stock data has update: " + System.DateTime.Now.ToLongDateString() + " " + System.DateTime.Now.ToLongTimeString() + " )";
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
