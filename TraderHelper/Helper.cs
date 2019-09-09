@@ -13,37 +13,40 @@ namespace TraderHelper
         public static string HttpResponse(string url, string encoding)
         {
             // 获取响应流并读取数据
-            System.IO.Stream httpStream = HttpResponseStream(url);
-            System.IO.StreamReader streamReader = new System.IO.StreamReader(httpStream, Encoding.GetEncoding(encoding));
-
-            // 返回响应数据
-            return streamReader.ReadToEnd();
+            using (System.IO.Stream httpStream = HttpResponseStream(url))
+            using (System.IO.StreamReader streamReader = new System.IO.StreamReader(httpStream, Encoding.GetEncoding(encoding)))
+            {
+                // 返回响应数据
+                return streamReader.ReadToEnd();
+            }
         }
 
         public static System.IO.Stream HttpResponseStream(string url)
         {
             // 创建 HttpWeb 请求并接收相应
             HttpWebRequest httpRequst = WebRequest.Create(url) as HttpWebRequest;
-            HttpWebResponse httpResponse = httpRequst.GetResponse() as HttpWebResponse;
-
-            // 返回响应流
-            return httpResponse.GetResponseStream();
+            using (HttpWebResponse httpResponse = httpRequst.GetResponse() as HttpWebResponse)
+            {
+                // 返回响应流
+                return httpResponse.GetResponseStream();
+            }
         }
 
         public static System.Drawing.Image HttpRequestImage(string url)
         {
             // 获取响应流
-            System.IO.Stream httpStream = HttpResponseStream(url);
-
-            // 返回图像数据
-            try
-            {
-                System.Drawing.Image image = System.Drawing.Image.FromStream(httpStream);
-                return image;
-            }
-            catch(System.ArgumentException exp)
-            {
-                throw exp;
+            using (System.IO.Stream httpStream = HttpResponseStream(url))
+            { 
+                // 返回图像数据
+                try
+                {
+                    System.Drawing.Image image = System.Drawing.Image.FromStream(httpStream);
+                    return image;
+                }
+                catch (System.ArgumentException exp)
+                {
+                    throw exp;
+                }
             }
         }
 
