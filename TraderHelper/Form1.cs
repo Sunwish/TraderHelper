@@ -132,5 +132,10 @@ namespace TraderHelper
 
             listView1.Items.AddRange(new ListViewItem[] { lvi_1 });
         }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            // Implement this function later.
+        }
     }
 }

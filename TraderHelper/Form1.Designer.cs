@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem7 = new System.Windows.Forms.ListViewItem(new string[] {
             "600123",
             "兰花科技",
             "6.750",
@@ -45,6 +45,7 @@
             this.StockCode = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.PriceDown = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.button1 = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -99,9 +100,9 @@
             this.PriceDown});
             this.listView1.Cursor = System.Windows.Forms.Cursors.Default;
             this.listView1.FullRowSelect = true;
-            listViewItem1.StateImageIndex = 0;
+            listViewItem7.StateImageIndex = 0;
             this.listView1.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem1});
+            listViewItem7});
             this.listView1.Location = new System.Drawing.Point(36, 335);
             this.listView1.MultiSelect = false;
             this.listView1.Name = "listView1";
@@ -148,12 +149,24 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
+            // button2
+            // 
+            this.button2.Enabled = false;
+            this.button2.Location = new System.Drawing.Point(548, 224);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(208, 42);
+            this.button2.TabIndex = 7;
+            this.button2.Text = "添加到列表";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(773, 489);
+            this.ClientSize = new System.Drawing.Size(785, 489);
+            this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.listView1);
             this.Controls.Add(this.pictureBox1);
@@ -182,6 +195,7 @@
         private System.Windows.Forms.ColumnHeader StockCode;
         private System.Windows.Forms.ColumnHeader PriceDown;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button button2;
     }
 }
 
