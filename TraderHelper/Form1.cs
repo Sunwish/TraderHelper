@@ -14,6 +14,8 @@ namespace TraderHelper
     public partial class Form1 : Form
     {
         const string Formtitle = "Trader Helper";
+        const int GCTime = 10;  // GC时间间隔(s), 计时依赖于timer
+        int GCTimeFlow = 10;
         Timer timer = new Timer();
         
         public Form1()
@@ -80,6 +82,12 @@ namespace TraderHelper
                 this.Text = Formtitle + " (Stock data has update: " + System.DateTime.Now.ToLongDateString() + " " + System.DateTime.Now.ToLongTimeString() + " )";
             else
                 this.Text = Formtitle + " (Request Error!)";
+            if(--GCTimeFlow<0)
+            {
+                GC.Collect();
+                GCTimeFlow = GCTime;
+            }
+            
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
