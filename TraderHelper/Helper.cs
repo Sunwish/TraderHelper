@@ -57,5 +57,11 @@ namespace TraderHelper
             Match match = reg.Match(source);
             return match.ToString();
         }
+
+        public static Match Regexer_Ex(string regex, string source)
+        {
+            Regex reg = new Regex(regex);
+            return reg.Match(source);
+        }
     }
 }

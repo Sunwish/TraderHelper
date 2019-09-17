@@ -26,7 +26,7 @@ namespace TraderHelper
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            Get2DisplayShareInfomation(textBox1.Text);
+            Get2DisplayShareInfomation(textBox1.Text, true);
 
             GCTimeFlow = GCTime;
 
@@ -36,10 +36,10 @@ namespace TraderHelper
             timer.Start();
         }
 
-        private bool Get2DisplayShareInfomation(string code)
+        private bool Get2DisplayShareInfomation(string code, bool getFully = false)
         {
             textBox2.Text = "";
-            pictureBox1.Image = null;
+            // pictureBox1.Image = null;
 
             try
             {
@@ -52,9 +52,19 @@ namespace TraderHelper
                 string outputString = "股票名称: " + share.shareData.shareName + "\n现价:" + share.shareData.currentPrice + "\n买一: " + share.shareData.buyPrice[0] + "\n卖一:" + share.shareData.sellPrice[0] + "\n数据时间: " + share.shareData.dataTime;
                 textBox2.Text = outputString.Replace("\n", Environment.NewLine + Environment.NewLine);
 
-                // Get Share real-time image
-                string httpImageHeader = "http://image.sinajs.cn/newchart/min/n/";
-                pictureBox1.Image = Helper.HttpRequestImage(httpImageHeader + shareType + shareCode + ".gif");
+                // Trading-time judgement
+                /// Get Hour-Minute
+                System.Text.RegularExpressions.Match timePartMatch = Helper.Regexer_Ex(@"\d{2}", share.shareData.dataTime);
+                /// Convert to minutes
+                int currentTime = int.Parse(timePartMatch.ToString()) * 60 + int.Parse(timePartMatch.NextMatch().ToString());
+                /// Reload Picture only in trading time (or in necessary cases)
+                if (((currentTime >= 9*60 && currentTime<11*60+30) || (currentTime >= 13*60 && currentTime < 15*60)) || getFully)
+                {
+                    // Get Share real-time image
+                    string httpImageHeader = "http://image.sinajs.cn/newchart/min/n/";
+                    pictureBox1.Image = Helper.HttpRequestImage(httpImageHeader + shareType + shareCode + ".gif");
+                    System.Diagnostics.Debug.WriteLine("Picture!");
+                }
 
                 return true;
             }
@@ -97,7 +107,7 @@ namespace TraderHelper
             if(textBox1.TextLength == 6)
             {
                 textBox1.ForeColor = Color.Black;
-                Get2DisplayShareInfomation(textBox1.Text);
+                Get2DisplayShareInfomation(textBox1.Text, true);
             }
             else
             {
