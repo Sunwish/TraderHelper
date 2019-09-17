@@ -14,8 +14,8 @@ namespace TraderHelper
     public partial class Form1 : Form
     {
         const string Formtitle = "Trader Helper";
-        const int GCTime = 10;  // GC时间间隔(s), 计时依赖于timer
-        int GCTimeFlow = 10;
+        const int GCTime = 3;  // GC时间间隔(s), 计时依赖于timer
+        int GCTimeFlow;
         Timer timer = new Timer();
         
         public Form1()
@@ -27,6 +27,8 @@ namespace TraderHelper
         private void Form1_Load(object sender, EventArgs e)
         {
             Get2DisplayShareInfomation(textBox1.Text);
+
+            GCTimeFlow = GCTime;
 
             // Set timer to update stock data automatically
             timer.Interval = 1000;
@@ -102,6 +104,23 @@ namespace TraderHelper
                 textBox1.ForeColor = Color.Red;
             }
 
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            string stockCode = "600125";
+            string stockName = "铁龙物流";
+            string stockPriceUp = "6.290";
+            string stockPriceCurrent = "6.090";
+            string stockPriceDown = "5.890";
+
+            ListViewItem lvi_1 = new ListViewItem(stockCode);
+            lvi_1.SubItems.Add(stockName);
+            lvi_1.SubItems.Add(stockPriceUp);
+            lvi_1.SubItems.Add(stockPriceCurrent);
+            lvi_1.SubItems.Add(stockPriceDown);
+
+            listView1.Items.AddRange(new ListViewItem[] { lvi_1 });
         }
     }
 }
