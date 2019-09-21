@@ -29,6 +29,8 @@ namespace TraderHelper
         {
             string code = textBox1.Text;
             if (Helper.isStockCodeExistList(code, stockListFilePath)) button2.Enabled = false;
+
+            Get2DisplayStockList();
             Get2DisplayShareInfomation(code, true);
 
             GCTimeFlow = GCTime;
@@ -39,6 +41,21 @@ namespace TraderHelper
             timer.Start();
         }
 
+        private void Get2DisplayStockList()
+        {
+            using (StreamReader streamReader = new StreamReader(@"stockList.ini"))
+            {
+                string line = streamReader.ReadLine();
+                Share share = null;
+                while (line != null)
+                {
+                    share = GetShareByCode(line);
+                    Add2StockList(share.shareInfo.shareUrlCode, share.shareData.shareName, "", share.shareData.currentPrice, "");
+                    line = streamReader.ReadLine();
+                }
+            }
+        }
+
         private bool Get2DisplayShareInfomation(string code, bool getFully = false)
         {
             textBox2.Text = "";
@@ -47,11 +64,7 @@ namespace TraderHelper
             try
             {
                 // Get Share Data
-                string httpHeader = "http://hq.sinajs.cn/list=";
-                string shareCode = code;
-                string shareType = shareCode.First() == '0' ? "sz" : "sh";
-
-                Share share = Share.CreateFromShareInfo(ShareInfo.Build(httpHeader, shareType, shareCode));
+                Share share = GetShareByCode(code);
                 string outputString = "股票名称: " + share.shareData.shareName + "\n现价:" + share.shareData.currentPrice + "\n买一: " + share.shareData.buyPrice[0] + "\n卖一:" + share.shareData.sellPrice[0] + "\n数据时间: " + share.shareData.dataTime;
                 textBox2.Text = outputString.Replace("\n", Environment.NewLine + Environment.NewLine);
 
@@ -64,8 +77,7 @@ namespace TraderHelper
                 if (((currentTime >= 9*60 && currentTime<11*60+30) || (currentTime >= 13*60 && currentTime < 15*60)) || getFully)
                 {
                     // Get Share real-time image
-                    string httpImageHeader = "http://image.sinajs.cn/newchart/min/n/";
-                    pictureBox1.Image = Helper.HttpRequestImage(httpImageHeader + shareType + shareCode + ".gif");
+                    pictureBox1.Image = GetShareImgByCode(code);
                     System.Diagnostics.Debug.WriteLine("Picture!");
                 }
 
@@ -78,6 +90,22 @@ namespace TraderHelper
                 textBox2.Text = exception.Message;
                 return false;
             }
+        }
+
+        private Share GetShareByCode(string shareCode)
+        {
+            // Get Share Data
+            string httpHeader = "http://hq.sinajs.cn/list=";
+            string shareType = shareCode.First() == '0' ? "sz" : "sh";
+            return Share.CreateFromShareInfo(ShareInfo.Build(httpHeader, shareType, shareCode));
+        }
+
+        private Image GetShareImgByCode(string shareCode)
+        {
+            // Get Share real-time image
+            string httpImageHeader = "http://image.sinajs.cn/newchart/min/n/";
+            string shareType = shareCode.First() == '0' ? "sz" : "sh";
+            return Helper.HttpRequestImage(httpImageHeader + shareType + shareCode + ".gif");
         }
 
         private void textBox1_KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
@@ -124,6 +152,17 @@ namespace TraderHelper
 
         }
 
+        private void Add2StockList(string stockCode, string stockName, string stockPriceUp, string stockPriceCurrent, string stockPriceDown)
+        {
+            ListViewItem lvi_1 = new ListViewItem(stockCode);
+            lvi_1.SubItems.Add(stockName);
+            lvi_1.SubItems.Add(stockPriceUp);
+            lvi_1.SubItems.Add(stockPriceCurrent);
+            lvi_1.SubItems.Add(stockPriceDown);
+
+            listView1.Items.AddRange(new ListViewItem[] { lvi_1 });
+        }
+
         private void button1_Click(object sender, EventArgs e)
         {
             string stockCode = "600125";
@@ -155,9 +194,9 @@ namespace TraderHelper
             using (System.IO.StreamWriter streamWriter = new System.IO.StreamWriter(stockListFilePath, true))
             {
                 streamWriter.WriteLine(textBox1.Text);
+                UpdateStockList();
+                button2.Enabled = false;
             }
-
-            UpdateStockList();
         }
 
         private void button5_Click(object sender, EventArgs e)

@@ -28,12 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem(new string[] {
-            "600123",
-            "兰花科技",
-            "6.750",
-            "6.720",
-            "6.520"}, -1);
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -101,9 +95,6 @@
             this.PriceDown});
             this.listView1.Cursor = System.Windows.Forms.Cursors.Default;
             this.listView1.FullRowSelect = true;
-            listViewItem1.StateImageIndex = 0;
-            this.listView1.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem1});
             this.listView1.Location = new System.Drawing.Point(36, 335);
             this.listView1.MultiSelect = false;
             this.listView1.Name = "listView1";
