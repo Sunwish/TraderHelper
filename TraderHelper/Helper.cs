@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.IO;
 
 namespace TraderHelper
 {
@@ -62,6 +63,21 @@ namespace TraderHelper
         {
             Regex reg = new Regex(regex);
             return reg.Match(source);
+        }
+
+        public static bool isStockCodeExistList(string code, string filePath)
+        {
+            using (StreamReader streamReader = new StreamReader(filePath))
+            {
+                string line = streamReader.ReadLine();
+                while(line!=null)
+                {
+                    if (line == code)
+                        return true;
+                    line = streamReader.ReadLine();
+                }
+            }
+           return false;
         }
     }
 }

@@ -16,6 +16,7 @@ namespace TraderHelper
         const string Formtitle = "Trader Helper";
         const int GCTime = 3;  // GC时间间隔(s), 计时依赖于timer
         int GCTimeFlow;
+        const string stockListFilePath = @"stockList.ini";
         Timer timer = new Timer();
         
         public Form1()
@@ -26,7 +27,9 @@ namespace TraderHelper
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            Get2DisplayShareInfomation(textBox1.Text, true);
+            string code = textBox1.Text;
+            if (Helper.isStockCodeExistList(code, stockListFilePath)) button2.Enabled = false;
+            Get2DisplayShareInfomation(code, true);
 
             GCTimeFlow = GCTime;
 
@@ -70,6 +73,7 @@ namespace TraderHelper
             }
             catch (SystemException exception)
             {
+                button2.Enabled = false;
                 textBox1.ForeColor = Color.Red;
                 textBox2.Text = exception.Message;
                 return false;
@@ -106,11 +110,15 @@ namespace TraderHelper
         {
             if(textBox1.TextLength == 6)
             {
+                string code = textBox1.Text;
+                if (Helper.isStockCodeExistList(code, stockListFilePath)) button2.Enabled = false;
+                else button2.Enabled = true;
                 textBox1.ForeColor = Color.Black;
-                Get2DisplayShareInfomation(textBox1.Text, true);
+                Get2DisplayShareInfomation(code, true);
             }
             else
             {
+                button2.Enabled = false;
                 textBox1.ForeColor = Color.Red;
             }
 
@@ -133,9 +141,36 @@ namespace TraderHelper
             listView1.Items.AddRange(new ListViewItem[] { lvi_1 });
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void UpdateStockList()
         {
             // Implement this function later.
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            
+            string tarCode = textBox1.Text;
+            if (Helper.isStockCodeExistList(tarCode, stockListFilePath)) return;
+
+            using (System.IO.StreamWriter streamWriter = new System.IO.StreamWriter(stockListFilePath, true))
+            {
+                streamWriter.WriteLine(textBox1.Text);
+            }
+
+            UpdateStockList();
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            using (StreamReader streamReader = new StreamReader(@"stockList.ini"))
+            {
+                string line = streamReader.ReadLine();
+                while (line!=null)
+                {
+                    Console.WriteLine(line);
+                    line = streamReader.ReadLine();
+                }
+            }
         }
     }
 }
