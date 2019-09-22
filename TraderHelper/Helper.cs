@@ -51,7 +51,6 @@ namespace TraderHelper
             }
         }
 
-
         public static string Regexer(string regex, string source)
         {
             Regex reg = new Regex(regex);

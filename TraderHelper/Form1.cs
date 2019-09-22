@@ -39,11 +39,21 @@ namespace TraderHelper
             timer.Interval = 1000;
             timer.Tick += Timer_Tick;
             timer.Start();
+
+            listView1.DoubleClick += ListView1_DoubleClick;
+        }
+
+        private void ListView1_DoubleClick(object sender, EventArgs e)
+        {
+            //throw new NotImplementedException();
+            ListView lv = sender as ListView;
+            string code =lv.SelectedItems[0].Text;
+            textBox1.Text = code;
         }
 
         private void Get2DisplayStockList()
         {
-            using (StreamReader streamReader = new StreamReader(@"stockList.ini"))
+            using (StreamReader streamReader = new StreamReader(stockListFilePath))
             {
                 string line = streamReader.ReadLine();
                 Share share = null;
@@ -149,7 +159,6 @@ namespace TraderHelper
                 button2.Enabled = false;
                 textBox1.ForeColor = Color.Red;
             }
-
         }
 
         private void Add2StockList(string stockCode, string stockName, string stockPriceUp, string stockPriceCurrent, string stockPriceDown)
@@ -163,26 +172,11 @@ namespace TraderHelper
             listView1.Items.AddRange(new ListViewItem[] { lvi_1 });
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            string stockCode = "600125";
-            string stockName = "铁龙物流";
-            string stockPriceUp = "6.290";
-            string stockPriceCurrent = "6.090";
-            string stockPriceDown = "5.890";
-
-            ListViewItem lvi_1 = new ListViewItem(stockCode);
-            lvi_1.SubItems.Add(stockName);
-            lvi_1.SubItems.Add(stockPriceUp);
-            lvi_1.SubItems.Add(stockPriceCurrent);
-            lvi_1.SubItems.Add(stockPriceDown);
-
-            listView1.Items.AddRange(new ListViewItem[] { lvi_1 });
-        }
-
         private void UpdateStockList()
         {
             // Implement this function later.
+            listView1.Items.Clear();
+            Get2DisplayStockList();
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -193,23 +187,10 @@ namespace TraderHelper
 
             using (System.IO.StreamWriter streamWriter = new System.IO.StreamWriter(stockListFilePath, true))
             {
-                streamWriter.WriteLine(textBox1.Text);
-                UpdateStockList();
-                button2.Enabled = false;
+                streamWriter.WriteLine(textBox1.Text); 
             }
-        }
-
-        private void button5_Click(object sender, EventArgs e)
-        {
-            using (StreamReader streamReader = new StreamReader(@"stockList.ini"))
-            {
-                string line = streamReader.ReadLine();
-                while (line!=null)
-                {
-                    Console.WriteLine(line);
-                    line = streamReader.ReadLine();
-                }
-            }
+            UpdateStockList();
+            button2.Enabled = false;
         }
     }
 }
