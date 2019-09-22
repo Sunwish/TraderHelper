@@ -350,9 +350,12 @@ namespace TraderHelper
                     continue;
                 using (StreamReader stremReader = new StreamReader(filePath))
                 {
-                    System.Text.RegularExpressions.Match result = Helper.Regexer_Ex("(?<={).+(?=})", stremReader.ReadToEnd());
+                    string[] config = stremReader.ReadToEnd().Split('\n');
+                    if (config.Length < 2) return;
+                    System.Text.RegularExpressions.Match result = Helper.Regexer_Ex("(?<={).+(?=})", config[0]);
                     string upPrice = result.Value.ToString();
-                    string downPrice = result.NextMatch().ToString();
+                    result = Helper.Regexer_Ex("(?<={).+(?=})", config[1]);
+                    string downPrice = result.ToString();
                     lvi.SubItems[subitemIndex_UpPrice].Text = upPrice;
                     lvi.SubItems[subitemIndex_DownPrice].Text = downPrice;
                 }
@@ -367,7 +370,7 @@ namespace TraderHelper
             string currentPrice = share.shareData.currentPrice;
             string upPrice = textBox_PriceSettingUp.Text;
             string downPrice = textBox_PriceSettingDown.Text;
-            if (upPrice == "" || downPrice == "" || float.Parse(upPrice) <= float.Parse(currentPrice) || float.Parse(downPrice) >= float.Parse(currentPrice))
+            if ((upPrice != "" && float.Parse(upPrice) <= float.Parse(currentPrice)) || (downPrice != "" && float.Parse(downPrice) >= float.Parse(currentPrice)))
             {
                 MessageBox.Show("上破价或下破价设置有误，请检查修改后再确认设置。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
