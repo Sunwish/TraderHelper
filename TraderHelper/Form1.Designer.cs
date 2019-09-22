@@ -265,6 +265,7 @@
             this.Controls.Add(this.textBox_StockInformation);
             this.Controls.Add(this.textBox_StockCode);
             this.Controls.Add(this.UpDownPriceConfigPanal);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
             this.Text = "Trader Helper";
             this.Load += new System.EventHandler(this.Form1_Load);

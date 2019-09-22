@@ -93,19 +93,22 @@ namespace TraderHelper
 
         private string Get2DisplayStockList() // return first stock code
         {
-            using (StreamReader streamReader = new StreamReader(stockListFilePath))
-            {
-                string line = streamReader.ReadLine();
-                string first = line;
-                Share share = null;
-                while (line != null)
+            if (!File.Exists(stockListFilePath))
+                using (StreamWriter streamWriter = new StreamWriter(stockListFilePath))
+                    streamWriter.Write("");
+                using (StreamReader streamReader = new StreamReader(stockListFilePath))
                 {
-                    share = GetShareByCode(line);
-                    Add2StockList(share.shareInfo.shareUrlCode, share.shareData.shareName, "", share.shareData.currentPrice, "");
-                    line = streamReader.ReadLine();
+                    string line = streamReader.ReadLine();
+                    string first = line;
+                    Share share = null;
+                    while (line != null)
+                    {
+                        share = GetShareByCode(line);
+                        Add2StockList(share.shareInfo.shareUrlCode, share.shareData.shareName, "", share.shareData.currentPrice, "");
+                        line = streamReader.ReadLine();
+                    }
+                    return first;
                 }
-                return first;
-            }
         }
 
         private bool Get2DisplayShareInfomationByCode(string code, bool getFully = false)
@@ -233,8 +236,12 @@ namespace TraderHelper
                     if (downPrice != 0 && downPrice >= currentPrice)
                         warningType = 1;
 
-                    if(warningType != -1)
+                    if (warningType != -1)
                     {
+                        // Highlight warning item in listview
+                        lvi.ForeColor = warningType == 0 ? Color.Red : Color.Green;
+
+                        // Create Warning Messagebox
                         if (!WarningMessageBox.isShareBind(share))
                         {
                             WarningMessageBox msg = new WarningMessageBox(share, warningType, lvi.SubItems[subitemIndex_DownPrice].Text, this);
@@ -242,6 +249,7 @@ namespace TraderHelper
                         }
                         warningdPlayer.Play();
                     }
+                    else lvi.ForeColor = Color.Black;
                 }
             }
             
@@ -345,6 +353,7 @@ namespace TraderHelper
                 if (result.ToString() != "Yes") return;
 
                 listView_StockList.FindItemWithText(tarCode).Remove();
+                UpdateStockList(true);
                 File.Delete(stockUpDownPriceDirectoryPath + @"\" + tarCode);
             }
         }
