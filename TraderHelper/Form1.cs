@@ -21,6 +21,7 @@ namespace TraderHelper
         const string httpHeader = "http://hq.sinajs.cn/list=";
         const string httpImageHeader = "http://image.sinajs.cn/newchart/min/n/";
         const string stockListFilePath = @"stockList.ini";
+        const string stockUpDownPriceDirectoryPath = @"stocksConfig";
         int currentIndex = -1;
         const int subitemIndex_UpPrice = 2;
         const int subitemIndex_CurrentPrice = 3;
@@ -42,10 +43,8 @@ namespace TraderHelper
         private void Form1_Load(object sender, EventArgs e)
         {
             string code = null;
-            listView_StockList.Click += ListView1_Click;
-            listView_StockList.DoubleClick += ListView1_Click;
-            listView_StockList.HideSelection = false;
 
+            // Infomation panal initialize
             // Get Stock List and display the first stock
             string firstStock = Get2DisplayStockList();
             if (firstStock != null)
@@ -56,11 +55,23 @@ namespace TraderHelper
             }
             else code = DefaultCode;
             textBox_StockCode.Text = code;
+
+            // Listview initialize
+            if (!Directory.Exists(stockUpDownPriceDirectoryPath))
+                Directory.CreateDirectory(stockUpDownPriceDirectoryPath);
+            listView_StockList.Click += ListView1_Click;
+            listView_StockList.DoubleClick += ListView1_Click;
+            listView_StockList.HideSelection = false;
+            UpdatePriceSetting();
+
+            // Display Data
             Get2DisplayShareInfomationByCode(code, true);
 
+            // GC Time initialize
             GCTimeFlow = GCTime;
+
             // Set timer to update stock data automatically
-            timer.Interval = 1000;
+            timer.Interval = 1000*100000;
             timer.Tick += Timer_Tick;
             timer.Start();
         }
@@ -103,15 +114,21 @@ namespace TraderHelper
                 string outputString = "股票名称: " + share.shareData.shareName + "\n现价:" + share.shareData.currentPrice + "\n买一: " + share.shareData.buyPrice[0] + "\n卖一:" + share.shareData.sellPrice[0] + "\n数据时间: " + share.shareData.dataTime;
                 textBox_StockInformation.Text = outputString.Replace("\n", Environment.NewLine + Environment.NewLine);
 
-                // Update Up/Down Price panal current price / down price / up price
+                // Update Up/Down Price panal current price / down price / up price               
                 ListViewItem lvi = listView_StockList.FindItemWithText(code);
-                textBox_PriceSettingCurrent.Text = share.shareData.currentPrice;
-                if(getFully)
+                if (lvi != null)
                 {
-                    textBox_PriceSettingUp.Text = lvi.SubItems[subitemIndex_UpPrice].Text;
-                    textBox_PriceSettingDown.Text = lvi.SubItems[subitemIndex_DownPrice].Text;
+                    UpDownPriceConfigPanal.Enabled = true;
+                    textBox_PriceSettingCurrent.Text = share.shareData.currentPrice;
+                    if (getFully)
+                    {
+                        textBox_PriceSettingUp.Text = lvi.SubItems[subitemIndex_UpPrice].Text;
+                        textBox_PriceSettingDown.Text = lvi.SubItems[subitemIndex_DownPrice].Text;
+                    }
+                    currentIndex = lvi.Index;
                 }
-                currentIndex = lvi.Index;
+                else UpDownPriceConfigPanal.Enabled = false;
+
 
                 // Trading-time judgement
                 /// Get Hour-Minute
@@ -127,12 +144,14 @@ namespace TraderHelper
                 }
 
                 UpdateButtonType();
+                UpDownPriceConfigPanal.Enabled = true;
                 button_StockListItemOperate.Enabled = true;
 
                 return true;
             }
             catch (SystemException exception)
             {
+                UpDownPriceConfigPanal.Enabled = false;
                 button_StockListItemOperate.Enabled = false;
                 textBox_StockCode.ForeColor = Color.Red;
                 textBox_StockInformation.Text = exception.Message;
@@ -177,13 +196,13 @@ namespace TraderHelper
         {
             // Only numbers redix point and backspace can be entered (and redix point can only be entered once)
             TextBox textbox = sender as TextBox;
-            if (e.KeyChar != '\b' && (e.KeyChar != '.' || textbox.Text.IndexOf(".") != -1))
+            /*if (e.KeyChar != '\b' && (e.KeyChar != '.' || textbox.Text.IndexOf(".") != -1))
             {
                 if ((e.KeyChar < '0') || (e.KeyChar > '9'))
                 {
                     e.Handled = true;
                 }
-            }
+            }*/
         }
 
         private void Timer_Tick(object sender, EventArgs e)
@@ -200,8 +219,11 @@ namespace TraderHelper
             if (Get2DisplayShareInfomationByCode(textBox_StockCode.Text))
                 this.Text = Formtitle + " (Stock data has update: " + System.DateTime.Now.ToLongDateString() + " " + System.DateTime.Now.ToLongTimeString() + " )";
             else
+            { 
                 this.Text = Formtitle + " (Request Error!)";
-            if(--GCTimeFlow<0)
+                pictureBox_StockImage.Image = null;
+            }
+            if (--GCTimeFlow<0)
             {
                 GC.Collect();
                 GCTimeFlow = GCTime;
@@ -215,10 +237,11 @@ namespace TraderHelper
                 string code = textBox_StockCode.Text;
                 UpdateButtonType();
                 textBox_StockCode.ForeColor = Color.Black;
-                Get2DisplayShareInfomationByCode(code, true);
+                UpDownPriceConfigPanal.Enabled = Get2DisplayShareInfomationByCode(code, true);
             }
             else
             {
+                UpDownPriceConfigPanal.Enabled = false;
                 button_StockListItemOperate.Enabled = false;
                 textBox_StockCode.ForeColor = Color.Red;
             }
@@ -296,6 +319,45 @@ namespace TraderHelper
             }
         }
 
+        private void UpdatePriceSetting(bool write = false)
+        {
+            // throw new NotImplementedException();
+
+            if(write)
+            {
+                string output = "";
+                if (!Directory.Exists(stockUpDownPriceDirectoryPath))
+                    Directory.CreateDirectory(stockUpDownPriceDirectoryPath);
+                foreach (ListViewItem lvi in listView_StockList.Items)
+                {
+                    output = "";
+                    output += lvi.SubItems[subitemIndex_UpPrice] + Environment.NewLine;
+                    output += lvi.SubItems[subitemIndex_DownPrice] + Environment.NewLine;
+                    string code = lvi.Text;
+                    using (StreamWriter streamWriter = new StreamWriter(stockUpDownPriceDirectoryPath + @"\" + code))
+                    {
+                        streamWriter.Write(output);
+                    }
+                }
+                return;
+            }
+            foreach(ListViewItem lvi in listView_StockList.Items)
+            {
+                string code = lvi.Text;
+                string filePath = stockUpDownPriceDirectoryPath + @"\" + code;
+                if (!File.Exists(filePath))
+                    continue;
+                using (StreamReader stremReader = new StreamReader(filePath))
+                {
+                    System.Text.RegularExpressions.Match result = Helper.Regexer_Ex("(?<={).+(?=})", stremReader.ReadToEnd());
+                    string upPrice = result.Value.ToString();
+                    string downPrice = result.NextMatch().ToString();
+                    lvi.SubItems[subitemIndex_UpPrice].Text = upPrice;
+                    lvi.SubItems[subitemIndex_DownPrice].Text = downPrice;
+                }
+            }
+        }
+
         private void button_PriceSettingConfirm_Click(object sender, EventArgs e)
         {
             int index = currentIndex;
@@ -313,7 +375,28 @@ namespace TraderHelper
             listView_StockList.Items[index].SubItems[subitemIndex_DownPrice].Text = downPrice;
 
             // save to file (Implement later)
-            throw new NotImplementedException();
+            UpdatePriceSetting(true);
+        }
+
+        private void textBox_PriceSetting_TextChanged(object sender, EventArgs e)
+        {
+            TextBox textbox = sender as TextBox;
+            float currentPrice = float.Parse(textBox_PriceSettingCurrent.Text);
+            float price = textbox.Text == "" ? 0f :float.Parse(textbox.Text);
+            if (textbox.Tag.ToString() == "up")
+            {
+                if (price <= currentPrice)
+                    textbox.ForeColor = Color.FromArgb(255, 0, 0);
+                else
+                    textbox.ForeColor = Color.Black;
+            }
+            else if (textbox.Tag.ToString() == "down")
+            {
+                if (price >= currentPrice)
+                    textbox.ForeColor = Color.FromArgb(255, 0, 0);
+                else
+                    textbox.ForeColor = Color.Black;
+            }
         }
     }
 }

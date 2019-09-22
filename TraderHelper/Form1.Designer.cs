@@ -47,7 +47,9 @@
             this.label4 = new System.Windows.Forms.Label();
             this.button_PriceSettingConfirm = new System.Windows.Forms.Button();
             this.DivideLine = new System.Windows.Forms.GroupBox();
+            this.UpDownPriceConfigPanal = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_StockImage)).BeginInit();
+            this.UpDownPriceConfigPanal.SuspendLayout();
             this.SuspendLayout();
             // 
             // textBox_StockCode
@@ -150,7 +152,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label2.Location = new System.Drawing.Point(541, 379);
+            this.label2.Location = new System.Drawing.Point(13, 59);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(54, 19);
             this.label2.TabIndex = 8;
@@ -158,25 +160,28 @@
             // 
             // textBox_PriceSettingUp
             // 
-            this.textBox_PriceSettingUp.Location = new System.Drawing.Point(601, 375);
+            this.textBox_PriceSettingUp.Location = new System.Drawing.Point(73, 55);
             this.textBox_PriceSettingUp.Name = "textBox_PriceSettingUp";
             this.textBox_PriceSettingUp.Size = new System.Drawing.Size(152, 25);
             this.textBox_PriceSettingUp.TabIndex = 9;
+            this.textBox_PriceSettingUp.Tag = "up";
             this.textBox_PriceSettingUp.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textBox_PriceSettingUp.TextChanged += new System.EventHandler(this.textBox_PriceSetting_TextChanged);
             // 
             // textBox_PriceSettingDown
             // 
-            this.textBox_PriceSettingDown.Location = new System.Drawing.Point(601, 416);
+            this.textBox_PriceSettingDown.Location = new System.Drawing.Point(73, 96);
             this.textBox_PriceSettingDown.Name = "textBox_PriceSettingDown";
             this.textBox_PriceSettingDown.Size = new System.Drawing.Size(152, 25);
             this.textBox_PriceSettingDown.TabIndex = 11;
+            this.textBox_PriceSettingDown.Tag = "down";
             this.textBox_PriceSettingDown.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label3
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label3.Location = new System.Drawing.Point(541, 420);
+            this.label3.Location = new System.Drawing.Point(13, 100);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(54, 19);
             this.label3.TabIndex = 10;
@@ -186,7 +191,7 @@
             // 
             this.textBox_PriceSettingCurrent.AccessibleRole = System.Windows.Forms.AccessibleRole.PageTabList;
             this.textBox_PriceSettingCurrent.Enabled = false;
-            this.textBox_PriceSettingCurrent.Location = new System.Drawing.Point(601, 335);
+            this.textBox_PriceSettingCurrent.Location = new System.Drawing.Point(73, 15);
             this.textBox_PriceSettingCurrent.Name = "textBox_PriceSettingCurrent";
             this.textBox_PriceSettingCurrent.Size = new System.Drawing.Size(152, 25);
             this.textBox_PriceSettingCurrent.TabIndex = 13;
@@ -196,7 +201,7 @@
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label4.Location = new System.Drawing.Point(549, 340);
+            this.label4.Location = new System.Drawing.Point(21, 20);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(39, 20);
             this.label4.TabIndex = 12;
@@ -204,7 +209,7 @@
             // 
             // button_PriceSettingConfirm
             // 
-            this.button_PriceSettingConfirm.Location = new System.Drawing.Point(545, 455);
+            this.button_PriceSettingConfirm.Location = new System.Drawing.Point(17, 135);
             this.button_PriceSettingConfirm.Name = "button_PriceSettingConfirm";
             this.button_PriceSettingConfirm.Size = new System.Drawing.Size(208, 42);
             this.button_PriceSettingConfirm.TabIndex = 14;
@@ -220,6 +225,20 @@
             this.DivideLine.TabIndex = 15;
             this.DivideLine.TabStop = false;
             // 
+            // UpDownPriceConfigPanal
+            // 
+            this.UpDownPriceConfigPanal.Controls.Add(this.label4);
+            this.UpDownPriceConfigPanal.Controls.Add(this.button_PriceSettingConfirm);
+            this.UpDownPriceConfigPanal.Controls.Add(this.label2);
+            this.UpDownPriceConfigPanal.Controls.Add(this.textBox_PriceSettingCurrent);
+            this.UpDownPriceConfigPanal.Controls.Add(this.textBox_PriceSettingUp);
+            this.UpDownPriceConfigPanal.Controls.Add(this.label3);
+            this.UpDownPriceConfigPanal.Controls.Add(this.textBox_PriceSettingDown);
+            this.UpDownPriceConfigPanal.Location = new System.Drawing.Point(527, 319);
+            this.UpDownPriceConfigPanal.Name = "UpDownPriceConfigPanal";
+            this.UpDownPriceConfigPanal.Size = new System.Drawing.Size(247, 189);
+            this.UpDownPriceConfigPanal.TabIndex = 16;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
@@ -227,23 +246,19 @@
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(786, 520);
             this.Controls.Add(this.DivideLine);
-            this.Controls.Add(this.button_PriceSettingConfirm);
-            this.Controls.Add(this.textBox_PriceSettingCurrent);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.textBox_PriceSettingDown);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.textBox_PriceSettingUp);
-            this.Controls.Add(this.label2);
             this.Controls.Add(this.button_StockListItemOperate);
             this.Controls.Add(this.listView_StockList);
             this.Controls.Add(this.pictureBox_StockImage);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.textBox_StockInformation);
             this.Controls.Add(this.textBox_StockCode);
+            this.Controls.Add(this.UpDownPriceConfigPanal);
             this.Name = "Form1";
             this.Text = "Trader Helper";
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_StockImage)).EndInit();
+            this.UpDownPriceConfigPanal.ResumeLayout(false);
+            this.UpDownPriceConfigPanal.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -270,6 +285,7 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button button_PriceSettingConfirm;
         private System.Windows.Forms.GroupBox DivideLine;
+        private System.Windows.Forms.Panel UpDownPriceConfigPanal;
     }
 }
 
