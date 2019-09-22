@@ -140,7 +140,7 @@ namespace TraderHelper
                 {
                     // Get Share real-time image
                     pictureBox_StockImage.Image = GetShareImgByCode(code);
-                    System.Diagnostics.Debug.WriteLine("Picture!");
+                    // System.Diagnostics.Debug.WriteLine("Picture!");
                 }
 
                 UpdateButtonType();
@@ -284,6 +284,7 @@ namespace TraderHelper
             }
             listView_StockList.Items.Clear();
             Get2DisplayStockList();
+            UpdatePriceSetting();
         }
 
         private void button2_Click(object sender, EventArgs e)
