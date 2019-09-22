@@ -35,6 +35,8 @@ namespace TraderHelper
             this.MaximizeBox = false;
             InitializeComponent();
             textBox_StockCode.KeyPress += textBox1_KeyPress;
+            textBox_PriceSettingUp.KeyPress += priceInput_KeyPress;
+            textBox_PriceSettingDown.KeyPress += priceInput_KeyPress;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -81,7 +83,7 @@ namespace TraderHelper
                 while (line != null)
                 {
                     share = GetShareByCode(line);
-                    Add2StockList(share.shareInfo.shareUrlCode, share.shareData.shareName, "null", share.shareData.currentPrice, "null");
+                    Add2StockList(share.shareInfo.shareUrlCode, share.shareData.shareName, "", share.shareData.currentPrice, "");
                     line = streamReader.ReadLine();
                 }
                 return first;
@@ -163,6 +165,19 @@ namespace TraderHelper
         {
             // Only numbers and backspace can be entered
             if (e.KeyChar != '\b')
+            {
+                if ((e.KeyChar < '0') || (e.KeyChar > '9'))
+                {
+                    e.Handled = true;
+                }
+            }
+        }
+
+        private void priceInput_KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
+        {
+            // Only numbers redix point and backspace can be entered (and redix point can only be entered once)
+            TextBox textbox = sender as TextBox;
+            if (e.KeyChar != '\b' && (e.KeyChar != '.' || textbox.Text.IndexOf(".") != -1))
             {
                 if ((e.KeyChar < '0') || (e.KeyChar > '9'))
                 {
@@ -283,9 +298,19 @@ namespace TraderHelper
 
         private void button_PriceSettingConfirm_Click(object sender, EventArgs e)
         {
-            int index = currentIndex;            
-            listView_StockList.Items[index].SubItems[subitemIndex_UpPrice].Text = textBox_PriceSettingUp.Text;
-            listView_StockList.Items[index].SubItems[subitemIndex_DownPrice].Text = textBox_PriceSettingDown.Text;
+            int index = currentIndex;
+            string code = listView_StockList.Items[index].Text;
+            Share share = GetShareByCode(code);
+            string currentPrice = share.shareData.currentPrice;
+            string upPrice = textBox_PriceSettingUp.Text;
+            string downPrice = textBox_PriceSettingDown.Text;
+            if (upPrice == "" || downPrice == "" || float.Parse(upPrice) <= float.Parse(currentPrice) || float.Parse(downPrice) >= float.Parse(currentPrice))
+            {
+                MessageBox.Show("上破价或下破价设置有误，请检查修改后再确认设置。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            listView_StockList.Items[index].SubItems[subitemIndex_UpPrice].Text = upPrice;
+            listView_StockList.Items[index].SubItems[subitemIndex_DownPrice].Text = downPrice;
 
             // save to file (Implement later)
             throw new NotImplementedException();
