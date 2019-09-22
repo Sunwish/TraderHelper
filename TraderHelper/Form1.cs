@@ -17,6 +17,8 @@ namespace TraderHelper
         const int GCTime = 3;  // GC时间间隔(s), 计时依赖于timer
         int GCTimeFlow;
         const string stockListFilePath = @"stockList.ini";
+        static readonly string[] buttonTypeText = { "添加到自选股", "从自选股移除" };
+        int buttonType = 0; // 0.添加到自选股 1.从自选股移除
         Timer timer = new Timer();
         
         public Form1()
@@ -27,10 +29,23 @@ namespace TraderHelper
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            string code = textBox1.Text;
-            if (Helper.isStockCodeExistList(code, stockListFilePath)) button2.Enabled = false;
+            string code = null;
+            listView1.Click += ListView1_Click;
+            listView1.DoubleClick += ListView1_Click;
+            listView1.HideSelection = false;
+            // Get Stock List and display the first stock
 
-            Get2DisplayStockList();
+            //Select from firstStock
+            string firstStock = Get2DisplayStockList();
+            if (firstStock != null)
+            {
+                code = firstStock;
+                listView1.Items[0].Selected = true;
+                listView1.Select();
+            }
+            else code = "000001";
+            textBox1.Text = code;
+
             Get2DisplayShareInfomation(code, true);
 
             GCTimeFlow = GCTime;
@@ -39,11 +54,9 @@ namespace TraderHelper
             timer.Interval = 1000;
             timer.Tick += Timer_Tick;
             timer.Start();
-
-            listView1.DoubleClick += ListView1_DoubleClick;
         }
 
-        private void ListView1_DoubleClick(object sender, EventArgs e)
+        private void ListView1_Click(object sender, EventArgs e)
         {
             //throw new NotImplementedException();
             ListView lv = sender as ListView;
@@ -51,11 +64,12 @@ namespace TraderHelper
             textBox1.Text = code;
         }
 
-        private void Get2DisplayStockList()
+        private string Get2DisplayStockList() // return first stock code
         {
             using (StreamReader streamReader = new StreamReader(stockListFilePath))
             {
                 string line = streamReader.ReadLine();
+                string first = line;
                 Share share = null;
                 while (line != null)
                 {
@@ -63,6 +77,7 @@ namespace TraderHelper
                     Add2StockList(share.shareInfo.shareUrlCode, share.shareData.shareName, "", share.shareData.currentPrice, "");
                     line = streamReader.ReadLine();
                 }
+                return first;
             }
         }
 
@@ -90,6 +105,9 @@ namespace TraderHelper
                     pictureBox1.Image = GetShareImgByCode(code);
                     System.Diagnostics.Debug.WriteLine("Picture!");
                 }
+
+                UpdateButtonType();
+                button2.Enabled = true;
 
                 return true;
             }
@@ -149,8 +167,7 @@ namespace TraderHelper
             if(textBox1.TextLength == 6)
             {
                 string code = textBox1.Text;
-                if (Helper.isStockCodeExistList(code, stockListFilePath)) button2.Enabled = false;
-                else button2.Enabled = true;
+                UpdateButtonType();
                 textBox1.ForeColor = Color.Black;
                 Get2DisplayShareInfomation(code, true);
             }
@@ -159,6 +176,18 @@ namespace TraderHelper
                 button2.Enabled = false;
                 textBox1.ForeColor = Color.Red;
             }
+        }
+
+        private int UpdateButtonType()
+        {
+            string code = textBox1.Text;
+
+            if (Helper.isStockCodeExistList(code, stockListFilePath))   buttonType = 1;
+            else buttonType = 0;
+
+            button2.Text = buttonTypeText[buttonType];
+
+            return buttonType;
         }
 
         private void Add2StockList(string stockCode, string stockName, string stockPriceUp, string stockPriceCurrent, string stockPriceDown)
@@ -172,25 +201,52 @@ namespace TraderHelper
             listView1.Items.AddRange(new ListViewItem[] { lvi_1 });
         }
 
-        private void UpdateStockList()
+        private void UpdateStockList(bool write = false)
         {
-            // Implement this function later.
+            if(write)
+            {
+                string output = "";
+                foreach (ListViewItem item in listView1.Items)
+                {
+                    output += item.Text + Environment.NewLine;
+                    using (StreamWriter streamWriter = new StreamWriter(stockListFilePath, false))
+                    {
+                        streamWriter.Write(output);
+                    }
+                }
+                return;
+            }
             listView1.Items.Clear();
             Get2DisplayStockList();
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            
             string tarCode = textBox1.Text;
-            if (Helper.isStockCodeExistList(tarCode, stockListFilePath)) return;
-
-            using (System.IO.StreamWriter streamWriter = new System.IO.StreamWriter(stockListFilePath, true))
+            if(buttonType == 0) // Add to list
             {
-                streamWriter.WriteLine(textBox1.Text); 
+                if (Helper.isStockCodeExistList(tarCode, stockListFilePath)) return;
+
+                using (System.IO.StreamWriter streamWriter = new System.IO.StreamWriter(stockListFilePath, true))
+                {
+                    streamWriter.WriteLine(textBox1.Text);
+                }
+                UpdateStockList();
+                UpdateButtonType();
             }
-            UpdateStockList();
-            button2.Enabled = false;
+            else if(buttonType == 1) // Remove from list
+            {
+                foreach(ListViewItem item in listView1.Items)
+                {
+                    if(item.Text == tarCode)
+                    {
+                        listView1.Items[item.Index].Remove();
+                        UpdateStockList(true);
+                        UpdateButtonType();
+                        break;
+                    }
+                }
+            }
         }
     }
 }

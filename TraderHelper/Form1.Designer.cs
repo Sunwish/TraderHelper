@@ -48,7 +48,6 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(91, 25);
             this.textBox1.TabIndex = 0;
-            this.textBox1.Text = "600123";
             this.textBox1.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
@@ -135,7 +134,7 @@
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(208, 42);
             this.button2.TabIndex = 7;
-            this.button2.Text = "添加到列表";
+            this.button2.Text = "添加到自选股";
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
