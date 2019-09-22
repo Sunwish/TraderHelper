@@ -10,7 +10,7 @@ Github: https://github.com/Sunwish/TraderHelper
 
 Q: 如何启动 TraderHelper？
 
-A: 你可以使用 Visual Studio 打开根目录下的解决方案 **TraderHelper.sln**，手动编译一个 TraderHelper 的发布版本运行使用，也可以直接打开根目录下 **bin** 目录中的 **TraderHelper.exe** 来启动已编译好的发行版本。
+A: 你可以使用 Visual Studio 打开根目录下的解决方案 **TraderHelper.sln**，手动编译一个 TraderHelper 的发布版本运行使用，也可以直接打开根目录下 **Release_TH** 目录中的 **TraderHelper.exe** 来启动已编译好的发行版本。
 
 ----
 
