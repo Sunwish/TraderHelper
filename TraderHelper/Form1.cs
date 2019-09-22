@@ -21,33 +21,40 @@ namespace TraderHelper
         const string httpHeader = "http://hq.sinajs.cn/list=";
         const string httpImageHeader = "http://image.sinajs.cn/newchart/min/n/";
         const string stockListFilePath = @"stockList.ini";
+        int currentIndex = -1;
+        const int subitemIndex_UpPrice = 2;
+        const int subitemIndex_CurrentPrice = 3;
+        const int subitemIndex_DownPrice = 4;
         static readonly string[] buttonTypeText = { "添加到自选股", "从自选股移除" };        
         Timer timer = new Timer();
         
         public Form1()
         {
+            // 固定边框, 禁用标题栏最大化按钮
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
             InitializeComponent();
-            textBox1.KeyPress += textBox1_KeyPress;
+            textBox_StockCode.KeyPress += textBox1_KeyPress;
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
             string code = null;
-            listView1.Click += ListView1_Click;
-            listView1.DoubleClick += ListView1_Click;
-            listView1.HideSelection = false;
+            listView_StockList.Click += ListView1_Click;
+            listView_StockList.DoubleClick += ListView1_Click;
+            listView_StockList.HideSelection = false;
 
             // Get Stock List and display the first stock
             string firstStock = Get2DisplayStockList();
             if (firstStock != null)
             {
                 code = firstStock;
-                listView1.Items[0].Selected = true;
-                listView1.Select();
+                listView_StockList.Items[0].Selected = true;
+                listView_StockList.Select();
             }
             else code = DefaultCode;
-            textBox1.Text = code;
-            Get2DisplayShareInfomation(code, true);
+            textBox_StockCode.Text = code;
+            Get2DisplayShareInfomationByCode(code, true);
 
             GCTimeFlow = GCTime;
             // Set timer to update stock data automatically
@@ -61,7 +68,7 @@ namespace TraderHelper
             //throw new NotImplementedException();
             ListView lv = sender as ListView;
             string code =lv.SelectedItems[0].Text;
-            textBox1.Text = code;
+            textBox_StockCode.Text = code;
         }
 
         private string Get2DisplayStockList() // return first stock code
@@ -74,23 +81,35 @@ namespace TraderHelper
                 while (line != null)
                 {
                     share = GetShareByCode(line);
-                    Add2StockList(share.shareInfo.shareUrlCode, share.shareData.shareName, "", share.shareData.currentPrice, "");
+                    Add2StockList(share.shareInfo.shareUrlCode, share.shareData.shareName, "null", share.shareData.currentPrice, "null");
                     line = streamReader.ReadLine();
                 }
                 return first;
             }
         }
 
-        private bool Get2DisplayShareInfomation(string code, bool getFully = false)
+        private bool Get2DisplayShareInfomationByCode(string code, bool getFully = false)
         {
-            textBox2.Text = "";
+            textBox_StockInformation.Text = "";
 
             try
             {
                 // Get Share Data
                 Share share = GetShareByCode(code);
+
+                // Update Information Panal Text
                 string outputString = "股票名称: " + share.shareData.shareName + "\n现价:" + share.shareData.currentPrice + "\n买一: " + share.shareData.buyPrice[0] + "\n卖一:" + share.shareData.sellPrice[0] + "\n数据时间: " + share.shareData.dataTime;
-                textBox2.Text = outputString.Replace("\n", Environment.NewLine + Environment.NewLine);
+                textBox_StockInformation.Text = outputString.Replace("\n", Environment.NewLine + Environment.NewLine);
+
+                // Update Up/Down Price panal current price / down price / up price
+                ListViewItem lvi = listView_StockList.FindItemWithText(code);
+                textBox_PriceSettingCurrent.Text = share.shareData.currentPrice;
+                if(getFully)
+                {
+                    textBox_PriceSettingUp.Text = lvi.SubItems[subitemIndex_UpPrice].Text;
+                    textBox_PriceSettingDown.Text = lvi.SubItems[subitemIndex_DownPrice].Text;
+                }
+                currentIndex = lvi.Index;
 
                 // Trading-time judgement
                 /// Get Hour-Minute
@@ -101,20 +120,20 @@ namespace TraderHelper
                 if (((currentTime >= 9*60 && currentTime<11*60+30) || (currentTime >= 13*60 && currentTime < 15*60)) || getFully)
                 {
                     // Get Share real-time image
-                    pictureBox1.Image = GetShareImgByCode(code);
+                    pictureBox_StockImage.Image = GetShareImgByCode(code);
                     System.Diagnostics.Debug.WriteLine("Picture!");
                 }
 
                 UpdateButtonType();
-                button2.Enabled = true;
+                button_StockListItemOperate.Enabled = true;
 
                 return true;
             }
             catch (SystemException exception)
             {
-                button2.Enabled = false;
-                textBox1.ForeColor = Color.Red;
-                textBox2.Text = exception.Message;
+                button_StockListItemOperate.Enabled = false;
+                textBox_StockCode.ForeColor = Color.Red;
+                textBox_StockInformation.Text = exception.Message;
                 return false;
             }
         }
@@ -154,7 +173,16 @@ namespace TraderHelper
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            if (Get2DisplayShareInfomation(textBox1.Text))
+            // Update stock list current price information
+            Share share = null;
+            foreach (ListViewItem lvi in listView_StockList.Items)
+            {
+                share = GetShareByCode(lvi.Text);
+                lvi.SubItems[subitemIndex_CurrentPrice].Text = share.shareData.currentPrice;
+            }
+            
+            // Update Infomation Panal
+            if (Get2DisplayShareInfomationByCode(textBox_StockCode.Text))
                 this.Text = Formtitle + " (Stock data has update: " + System.DateTime.Now.ToLongDateString() + " " + System.DateTime.Now.ToLongTimeString() + " )";
             else
                 this.Text = Formtitle + " (Request Error!)";
@@ -163,33 +191,32 @@ namespace TraderHelper
                 GC.Collect();
                 GCTimeFlow = GCTime;
             }
-            
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
-            if(textBox1.TextLength == 6)
+            if(textBox_StockCode.TextLength == 6)
             {
-                string code = textBox1.Text;
+                string code = textBox_StockCode.Text;
                 UpdateButtonType();
-                textBox1.ForeColor = Color.Black;
-                Get2DisplayShareInfomation(code, true);
+                textBox_StockCode.ForeColor = Color.Black;
+                Get2DisplayShareInfomationByCode(code, true);
             }
             else
             {
-                button2.Enabled = false;
-                textBox1.ForeColor = Color.Red;
+                button_StockListItemOperate.Enabled = false;
+                textBox_StockCode.ForeColor = Color.Red;
             }
         }
 
         private int UpdateButtonType()
         {
-            string code = textBox1.Text;
+            string code = textBox_StockCode.Text;
 
             if (Helper.isStockCodeExistList(code, stockListFilePath))   buttonType = 1;
             else buttonType = 0;
 
-            button2.Text = buttonTypeText[buttonType];
+            button_StockListItemOperate.Text = buttonTypeText[buttonType];
 
             return buttonType;
         }
@@ -202,7 +229,7 @@ namespace TraderHelper
             lvi_1.SubItems.Add(stockPriceCurrent);
             lvi_1.SubItems.Add(stockPriceDown);
 
-            listView1.Items.AddRange(new ListViewItem[] { lvi_1 });
+            listView_StockList.Items.AddRange(new ListViewItem[] { lvi_1 });
         }
 
         private void UpdateStockList(bool write = false)
@@ -210,27 +237,27 @@ namespace TraderHelper
             if(write)
             {
                 string output = "";
-                foreach (ListViewItem item in listView1.Items) output += item.Text + Environment.NewLine;
+                foreach (ListViewItem item in listView_StockList.Items) output += item.Text + Environment.NewLine;
                 using (StreamWriter streamWriter = new StreamWriter(stockListFilePath, false))
                 {
                     streamWriter.Write(output);
                 }
                 return;
             }
-            listView1.Items.Clear();
+            listView_StockList.Items.Clear();
             Get2DisplayStockList();
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            string tarCode = textBox1.Text;
+            string tarCode = textBox_StockCode.Text;
             if(buttonType == 0) // Add to list
             {
                 if (Helper.isStockCodeExistList(tarCode, stockListFilePath)) return;
 
                 using (System.IO.StreamWriter streamWriter = new System.IO.StreamWriter(stockListFilePath, true))
                 {
-                    streamWriter.WriteLine(textBox1.Text);
+                    streamWriter.WriteLine(textBox_StockCode.Text);
                 }
                 UpdateStockList();
                 UpdateButtonType();
@@ -241,17 +268,27 @@ namespace TraderHelper
                 DialogResult result =  MessageBox.Show("移除自选股后，该股票的预警设置也将被丢弃，是否确认删除？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
                 if (result.ToString() != "Yes") return;
 
-                foreach (ListViewItem item in listView1.Items)
+                foreach (ListViewItem item in listView_StockList.Items)
                 {
                     if(item.Text == tarCode)
                     {
-                        listView1.Items[item.Index].Remove();
+                        listView_StockList.Items[item.Index].Remove();
                         UpdateStockList(true);
                         UpdateButtonType();
                         break;
                     }
                 }
             }
+        }
+
+        private void button_PriceSettingConfirm_Click(object sender, EventArgs e)
+        {
+            int index = currentIndex;            
+            listView_StockList.Items[index].SubItems[subitemIndex_UpPrice].Text = textBox_PriceSettingUp.Text;
+            listView_StockList.Items[index].SubItems[subitemIndex_DownPrice].Text = textBox_PriceSettingDown.Text;
+
+            // save to file (Implement later)
+            throw new NotImplementedException();
         }
     }
 }
