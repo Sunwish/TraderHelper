@@ -18,7 +18,8 @@ namespace TraderHelper
         static ArrayList bindCode = new ArrayList();
         string warningPrice;
         int warningType;
-        public WarningMessageBox(Share bindShare, int warningType/* 0.UpWarning, 1.DownWarning */, string warningPrice)
+        Form1 mainWindow;
+        public WarningMessageBox(Share bindShare, int warningType/* 0.UpWarning, 1.DownWarning */, string warningPrice, Form1 mainWindow)
         {
             // Add share to bind list
             bindCode.Add(bindShare.shareInfo.shareUrlCode);
@@ -30,6 +31,7 @@ namespace TraderHelper
             this.bindShare = bindShare;
             this.warningPrice = warningPrice;
             this.warningType = warningType;
+            this.mainWindow = mainWindow;
             InitializeComponent();
         }
 
@@ -51,6 +53,16 @@ namespace TraderHelper
         public static bool isShareBind(Share share)
         {
             return bindCode.IndexOf(share.shareInfo.shareUrlCode) != -1;
+        }
+
+        public static int getBindCount()
+        {
+            return bindCode.Count;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            mainWindow.WakeUp();
         }
     }
 }

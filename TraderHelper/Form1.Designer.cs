@@ -28,6 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.textBox_StockCode = new System.Windows.Forms.TextBox();
             this.textBox_StockInformation = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -48,6 +50,7 @@
             this.button_PriceSettingConfirm = new System.Windows.Forms.Button();
             this.DivideLine = new System.Windows.Forms.GroupBox();
             this.UpDownPriceConfigPanal = new System.Windows.Forms.Panel();
+            this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_StockImage)).BeginInit();
             this.UpDownPriceConfigPanal.SuspendLayout();
             this.SuspendLayout();
@@ -240,6 +243,14 @@
             this.UpDownPriceConfigPanal.Size = new System.Drawing.Size(247, 189);
             this.UpDownPriceConfigPanal.TabIndex = 16;
             // 
+            // notifyIcon1
+            // 
+            this.notifyIcon1.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon1.Icon")));
+            this.notifyIcon1.Text = "当前无预警触发";
+            this.notifyIcon1.Visible = true;
+            this.notifyIcon1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.notifyIcon1_MouseClick);
+            this.notifyIcon1.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.notifyIcon1_MouseClick);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
@@ -287,6 +298,7 @@
         private System.Windows.Forms.Button button_PriceSettingConfirm;
         private System.Windows.Forms.GroupBox DivideLine;
         private System.Windows.Forms.Panel UpDownPriceConfigPanal;
+        private System.Windows.Forms.NotifyIcon notifyIcon1;
     }
 }
 

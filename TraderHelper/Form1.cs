@@ -35,10 +35,16 @@ namespace TraderHelper
             // 固定边框, 禁用标题栏最大化按钮
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
+            this.Resize += Form1_Resize;
             InitializeComponent();
             textBox_StockCode.KeyPress += textBox1_KeyPress;
             textBox_PriceSettingUp.KeyPress += priceInput_KeyPress;
             textBox_PriceSettingDown.KeyPress += priceInput_KeyPress;
+        }
+
+        private void Form1_Resize(object sender, EventArgs e)
+        {
+            this.ShowInTaskbar = !(this.WindowState == FormWindowState.Minimized);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -231,7 +237,7 @@ namespace TraderHelper
                     {
                         if (!WarningMessageBox.isShareBind(share))
                         {
-                            WarningMessageBox msg = new WarningMessageBox(share, warningType, lvi.SubItems[subitemIndex_DownPrice].Text);
+                            WarningMessageBox msg = new WarningMessageBox(share, warningType, lvi.SubItems[subitemIndex_DownPrice].Text, this);
                             msg.Show();
                         }
                         warningdPlayer.Play();
@@ -252,6 +258,13 @@ namespace TraderHelper
                 GC.Collect();
                 GCTimeFlow = GCTime;
             }
+            
+            // Update notifyIcon text
+            int bindCount = WarningMessageBox.getBindCount();
+            if (bindCount == 0) 
+                notifyIcon1.Text = "当前无预警触发";
+            else
+                notifyIcon1.Text = "当前有" + String.Concat(bindCount) + "条预警被触发!";
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
@@ -417,6 +430,16 @@ namespace TraderHelper
                 else
                     textbox.ForeColor = Color.Black;
             }
+        }
+
+        private void notifyIcon1_MouseClick(object sender, MouseEventArgs e)
+        {
+            WakeUp();
+        }
+
+        public void WakeUp()
+        {
+            this.WindowState = FormWindowState.Normal;
         }
     }
 }
