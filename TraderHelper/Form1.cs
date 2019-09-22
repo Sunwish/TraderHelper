@@ -13,12 +13,15 @@ namespace TraderHelper
 {
     public partial class Form1 : Form
     {
-        const string Formtitle = "Trader Helper";
-        const int GCTime = 3;  // GC时间间隔(s), 计时依赖于timer
-        int GCTimeFlow;
-        const string stockListFilePath = @"stockList.ini";
-        static readonly string[] buttonTypeText = { "添加到自选股", "从自选股移除" };
         int buttonType = 0; // 0.添加到自选股 1.从自选股移除
+        int GCTimeFlow; // GC计时变量(s), 计时依赖于timer
+        const int GCTime = 3;  // GC时间间隔(s), 计时依赖于timer
+        const string DefaultCode = "000001";
+        const string Formtitle = "Trader Helper";
+        const string httpHeader = "http://hq.sinajs.cn/list=";
+        const string httpImageHeader = "http://image.sinajs.cn/newchart/min/n/";
+        const string stockListFilePath = @"stockList.ini";
+        static readonly string[] buttonTypeText = { "添加到自选股", "从自选股移除" };        
         Timer timer = new Timer();
         
         public Form1()
@@ -33,9 +36,8 @@ namespace TraderHelper
             listView1.Click += ListView1_Click;
             listView1.DoubleClick += ListView1_Click;
             listView1.HideSelection = false;
-            // Get Stock List and display the first stock
 
-            //Select from firstStock
+            // Get Stock List and display the first stock
             string firstStock = Get2DisplayStockList();
             if (firstStock != null)
             {
@@ -43,13 +45,11 @@ namespace TraderHelper
                 listView1.Items[0].Selected = true;
                 listView1.Select();
             }
-            else code = "000001";
+            else code = DefaultCode;
             textBox1.Text = code;
-
             Get2DisplayShareInfomation(code, true);
 
             GCTimeFlow = GCTime;
-
             // Set timer to update stock data automatically
             timer.Interval = 1000;
             timer.Tick += Timer_Tick;
@@ -84,7 +84,6 @@ namespace TraderHelper
         private bool Get2DisplayShareInfomation(string code, bool getFully = false)
         {
             textBox2.Text = "";
-            // pictureBox1.Image = null;
 
             try
             {
@@ -120,19 +119,24 @@ namespace TraderHelper
             }
         }
 
+        private string GetShareTypeByCode(string shareCode)
+        {
+            if (shareCode == DefaultCode)
+                return "sh";
+            return shareCode.First() == '0' ? "sz" : "sh";
+        }
+
         private Share GetShareByCode(string shareCode)
         {
             // Get Share Data
-            string httpHeader = "http://hq.sinajs.cn/list=";
-            string shareType = shareCode.First() == '0' ? "sz" : "sh";
+            string shareType = GetShareTypeByCode(shareCode);
             return Share.CreateFromShareInfo(ShareInfo.Build(httpHeader, shareType, shareCode));
         }
 
         private Image GetShareImgByCode(string shareCode)
         {
-            // Get Share real-time image
-            string httpImageHeader = "http://image.sinajs.cn/newchart/min/n/";
-            string shareType = shareCode.First() == '0' ? "sz" : "sh";
+            // Get Share real-time image 
+            string shareType = GetShareTypeByCode(shareCode);
             return Helper.HttpRequestImage(httpImageHeader + shareType + shareCode + ".gif");
         }
 
@@ -206,13 +210,10 @@ namespace TraderHelper
             if(write)
             {
                 string output = "";
-                foreach (ListViewItem item in listView1.Items)
+                foreach (ListViewItem item in listView1.Items) output += item.Text + Environment.NewLine;
+                using (StreamWriter streamWriter = new StreamWriter(stockListFilePath, false))
                 {
-                    output += item.Text + Environment.NewLine;
-                    using (StreamWriter streamWriter = new StreamWriter(stockListFilePath, false))
-                    {
-                        streamWriter.Write(output);
-                    }
+                    streamWriter.Write(output);
                 }
                 return;
             }
@@ -236,7 +237,11 @@ namespace TraderHelper
             }
             else if(buttonType == 1) // Remove from list
             {
-                foreach(ListViewItem item in listView1.Items)
+                // Comfirm dialog
+                DialogResult result =  MessageBox.Show("移除自选股后，该股票的预警设置也将被丢弃，是否确认删除？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                if (result.ToString() != "Yes") return;
+
+                foreach (ListViewItem item in listView1.Items)
                 {
                     if(item.Text == tarCode)
                     {
