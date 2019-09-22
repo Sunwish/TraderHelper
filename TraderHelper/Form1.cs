@@ -26,7 +26,8 @@ namespace TraderHelper
         const int subitemIndex_UpPrice = 2;
         const int subitemIndex_CurrentPrice = 3;
         const int subitemIndex_DownPrice = 4;
-        static readonly string[] buttonTypeText = { "添加到自选股", "从自选股移除" };        
+        static readonly string[] buttonTypeText = { "添加到自选股", "从自选股移除" };
+        System.Media.SoundPlayer warningdPlayer = new System.Media.SoundPlayer("warning.wav");
         Timer timer = new Timer();
         
         public Form1()
@@ -213,6 +214,29 @@ namespace TraderHelper
             {
                 share = GetShareByCode(lvi.Text);
                 lvi.SubItems[subitemIndex_CurrentPrice].Text = share.shareData.currentPrice;
+                if(lvi.SubItems[subitemIndex_CurrentPrice].Text != "")
+                {
+                    int warningType = -1;
+                    float currentPrice = float.Parse(lvi.SubItems[subitemIndex_CurrentPrice].Text);
+                    float upPrice = lvi.SubItems[subitemIndex_UpPrice].Text == "" ? 0 : float.Parse(lvi.SubItems[subitemIndex_UpPrice].Text);
+                    float downPrice = lvi.SubItems[subitemIndex_DownPrice].Text == "" ? 0 : float.Parse(lvi.SubItems[subitemIndex_DownPrice].Text);
+
+                    // Warning Type jugement
+                    if (upPrice != 0 && upPrice <= currentPrice)
+                        warningType = 0;
+                    if (downPrice != 0 && downPrice >= currentPrice)
+                        warningType = 1;
+
+                    if(warningType != -1)
+                    {
+                        if (!WarningMessageBox.isShareBind(share))
+                        {
+                            WarningMessageBox msg = new WarningMessageBox(share, warningType, lvi.SubItems[subitemIndex_DownPrice].Text);
+                            msg.Show();
+                        }
+                        warningdPlayer.Play();
+                    }
+                }
             }
             
             // Update Infomation Panal
@@ -304,19 +328,11 @@ namespace TraderHelper
             else if(buttonType == 1) // Remove from list
             {
                 // Comfirm dialog
-                DialogResult result =  MessageBox.Show("移除自选股后，该股票的预警设置也将被丢弃，是否确认删除？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                DialogResult result =  MessageBox.Show("移除自选股后，该股票的预警设置也将被丢弃，是否确认删除？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Information, MessageBoxDefaultButton.Button2);
                 if (result.ToString() != "Yes") return;
 
-                foreach (ListViewItem item in listView_StockList.Items)
-                {
-                    if(item.Text == tarCode)
-                    {
-                        listView_StockList.Items[item.Index].Remove();
-                        UpdateStockList(true);
-                        UpdateButtonType();
-                        break;
-                    }
-                }
+                listView_StockList.FindItemWithText(tarCode).Remove();
+                File.Delete(stockUpDownPriceDirectoryPath + @"\" + tarCode);
             }
         }
 
