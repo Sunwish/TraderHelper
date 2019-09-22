@@ -71,7 +71,7 @@ namespace TraderHelper
             GCTimeFlow = GCTime;
 
             // Set timer to update stock data automatically
-            timer.Interval = 1000*100000;
+            timer.Interval = 1000;
             timer.Tick += Timer_Tick;
             timer.Start();
         }
@@ -196,13 +196,13 @@ namespace TraderHelper
         {
             // Only numbers redix point and backspace can be entered (and redix point can only be entered once)
             TextBox textbox = sender as TextBox;
-            /*if (e.KeyChar != '\b' && (e.KeyChar != '.' || textbox.Text.IndexOf(".") != -1))
+            if (e.KeyChar != '\b' && (e.KeyChar != '.' || textbox.Text.IndexOf(".") != -1))
             {
                 if ((e.KeyChar < '0') || (e.KeyChar > '9'))
                 {
                     e.Handled = true;
                 }
-            }*/
+            }
         }
 
         private void Timer_Tick(object sender, EventArgs e)

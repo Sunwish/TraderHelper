@@ -176,6 +176,7 @@
             this.textBox_PriceSettingDown.TabIndex = 11;
             this.textBox_PriceSettingDown.Tag = "down";
             this.textBox_PriceSettingDown.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textBox_PriceSettingDown.TextChanged += new System.EventHandler(this.textBox_PriceSetting_TextChanged);
             // 
             // label3
             // 
