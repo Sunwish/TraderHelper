@@ -6,6 +6,8 @@
 *.user
 *.userosscache
 *.sln.docstates
+Release_TH/*.ini
+Release_TH/stocksConfig
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
