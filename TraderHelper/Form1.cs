@@ -141,12 +141,8 @@ namespace TraderHelper
 
 
                 // Trading-time judgement
-                /// Get Hour-Minute
-                System.Text.RegularExpressions.Match timePartMatch = Helper.Regexer_Ex(@"\d{2}", share.shareData.dataTime);
-                /// Convert to minutes
-                int currentTime = int.Parse(timePartMatch.ToString()) * 60 + int.Parse(timePartMatch.NextMatch().ToString());
                 /// Reload Picture only in trading time (or in necessary cases)
-                if (((currentTime >= 9*60 && currentTime<11*60+30) || (currentTime >= 13*60 && currentTime < 15*60)) || getFully)
+                if (IsTradingTime(share.shareData.dataTime) || getFully)
                 {
                     // Get Share real-time image
                     pictureBox_StockImage.Image = GetShareImgByCode(code);
@@ -167,6 +163,17 @@ namespace TraderHelper
                 textBox_StockInformation.Text = exception.Message;
                 return false;
             }
+        }
+
+        private bool IsTradingTime(string shareDataTime)
+        {
+            // Trading-time judgement
+            /// Get Hour-Minute
+            System.Text.RegularExpressions.Match timePartMatch = Helper.Regexer_Ex(@"\d{2}", shareDataTime);
+            /// Convert to minutes
+            int currentTime = int.Parse(timePartMatch.ToString()) * 60 + int.Parse(timePartMatch.NextMatch().ToString());
+            /// Reload Picture only in trading time (or in necessary cases)
+            return ((currentTime >= 9 * 60 && currentTime < 11 * 60 + 30) || (currentTime >= 13 * 60 && currentTime < 15 * 60));
         }
 
         private string GetShareTypeByCode(string shareCode)
@@ -222,6 +229,7 @@ namespace TraderHelper
             foreach (ListViewItem lvi in listView_StockList.Items)
             {
                 share = GetShareByCode(lvi.Text);
+                // if (!IsTradingTime(share.shareData.dataTime)) continue;
                 lvi.SubItems[subitemIndex_CurrentPrice].Text = share.shareData.currentPrice;
                 if(lvi.SubItems[subitemIndex_CurrentPrice].Text != "")
                 {
@@ -229,6 +237,9 @@ namespace TraderHelper
                     float currentPrice = float.Parse(lvi.SubItems[subitemIndex_CurrentPrice].Text);
                     float upPrice = lvi.SubItems[subitemIndex_UpPrice].Text == "" ? 0 : float.Parse(lvi.SubItems[subitemIndex_UpPrice].Text);
                     float downPrice = lvi.SubItems[subitemIndex_DownPrice].Text == "" ? 0 : float.Parse(lvi.SubItems[subitemIndex_DownPrice].Text);
+
+                    if (currentPrice == 0)
+                        continue;
 
                     // Warning Type jugement
                     if (upPrice != 0 && upPrice <= currentPrice)
