@@ -6,11 +6,13 @@ An open source securities trading assistant that sets price warnings for differe
 
 Github: https://github.com/Sunwish/TraderHelper
 
+![TraderHelper主界面](https://i.loli.net/2020/06/23/mZsnOSDqQ6fdlUw.png)
+
 ## 常见问题
 
-Q: 如何启动 TraderHelper？
+Q: 如何获取 TraderHelper？
 
-A: 你可以使用 Visual Studio 打开根目录下的解决方案 **TraderHelper.sln**，手动编译一个 TraderHelper 的发布版本运行使用，也可以直接打开根目录下 **Release_TH** 目录中的 **TraderHelper.exe** 来启动已编译好的发行版本。
+A: 进入本仓库的 Release 页面下载最新发布版，解压后双击目录中的 TraderHelper.exe 即可启动程序。
 
 ----
 
@@ -41,3 +43,17 @@ A: 已触发的预警在主界面的自选股列表中将会标红/标绿显示�
 Q: 如何更换预警提示音？
 
 A: TraderHelper 支持自定义.wav格式的波形文件作为预警提示音，只需把要使用的标准.wav波形文件更名为 **warning.wav**，然后将其拷贝到 TraderHelper 的根目录下，替换掉原有的 warning.wav 即可。
+
+------------------
+
+Q: 微信提醒有什么用？
+
+A: 微信提醒可于出门在外等不方便呆在 TraderHelper 旁时开启，完成简单配置并开启后只需保持程序联网运行，即可在电脑上触发价格提醒的同时向所绑定的微信发送提醒推送。
+
+----------------
+
+Q: 如何开启微信提醒？
+
+A: 首先前往 Server酱（[http://sc.ftqq.com/](http://sc.ftqq.com/)）并用您的 Github 帐号登录 Server酱，然后点进 Server酱 顶部的 **微信推送** 页面，用微信扫码关注用于消息推送的公众号，并在页面中确认绑定，接下来进入 Server酱 的 **发送消息** 页面，将 SCKEY 码拷贝至 TraderHelper 目录下的 **serverChan.ini** 配置文件中，最后在 TraderHelper 主界面中勾选 **微信提醒** 即可。
+
+（首次配置时只需在程序中直接勾选 [微信提醒]，即可自动弹出配置文件）

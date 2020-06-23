@@ -8,11 +8,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+using System.Diagnostics;
+using Sunwish.Notifier;
 
 namespace TraderHelper
 {
     public partial class Form1 : Form
     {
+        string Notify_SCKEY = "";
         int buttonType = 0; // 0.添加到自选股 1.从自选股移除
         int GCTimeFlow; // GC计时变量(s), 计时依赖于timer
         const int GCTime = 3;  // GC时间间隔(s), 计时依赖于timer
@@ -21,6 +24,7 @@ namespace TraderHelper
         const string httpHeader = "http://hq.sinajs.cn/list=";
         const string httpImageHeader = "http://image.sinajs.cn/newchart/min/n/";
         const string stockListFilePath = @"stockList.ini";
+        const string wechatNotifyPath = @"serverChan.ini";
         const string stockUpDownPriceDirectoryPath = @"stocksConfig";
         int currentIndex = -1;
         const int subitemIndex_UpPrice = 2;
@@ -40,6 +44,14 @@ namespace TraderHelper
             textBox_StockCode.KeyPress += textBox1_KeyPress;
             textBox_PriceSettingUp.KeyPress += priceInput_KeyPress;
             textBox_PriceSettingDown.KeyPress += priceInput_KeyPress;
+
+            // Initialize warning player
+            /*
+            if (!File.Exists("warning.wav"))
+                warningdPlayer = new System.Media.SoundPlayer(Properties.Resources.warning);
+            else
+                warningdPlayer = new System.Media.SoundPlayer("warning.wav");
+            */
         }
 
         private void Form1_Resize(object sender, EventArgs e)
@@ -70,6 +82,22 @@ namespace TraderHelper
             listView_StockList.DoubleClick += ListView1_Click;
             listView_StockList.HideSelection = false;
             UpdatePriceSetting();
+
+            // Load wechat notify settings
+            /*
+            if (File.Exists(wechatNotifyPath))
+            {
+                using (StreamReader streamReader = new StreamReader(wechatNotifyPath))
+                {
+                    string SCKEY = streamReader.ReadLine();
+                    if (null != SCKEY && !SCKEY.Equals(""))
+                    {
+                        Notify_SCKEY = SCKEY;
+                        wechatNotify.Checked = true;
+                    }
+                }
+            }
+            */
 
             // Display Data
             Get2DisplayShareInfomationByCode(code, true);
@@ -119,7 +147,7 @@ namespace TraderHelper
             {
                 // Get Share Data
                 Share share = GetShareByCode(code);
-
+                 
                 // Update Information Panal Text
                 string outputString = "股票名称: " + share.shareData.shareName + "\n现价:" + share.shareData.currentPrice + "\n买一: " + share.shareData.buyPrice[0] + "\n卖一:" + share.shareData.sellPrice[0] + "\n数据时间: " + share.shareData.dataTime;
                 textBox_StockInformation.Text = outputString.Replace("\n", Environment.NewLine + Environment.NewLine);
@@ -252,12 +280,35 @@ namespace TraderHelper
                         // Highlight warning item in listview
                         lvi.ForeColor = warningType == 0 ? Color.Red : Color.Green;
 
-                        // Create Warning Messagebox
                         if (!WarningMessageBox.isShareBind(share))
                         {
+                            // Wechat notify
+                            int retry = 3;
+                            string title = "[" + share.shareInfo.shareUrlCode + "] " + share.shareData.shareName + " 触发" + (warningType == 0 ? "上" : "下") + "破价格 " + lvi.SubItems[subitemIndex_DownPrice].Text;
+                            string content = title + ", 现价 " + share.shareData.currentPrice;
+                            WechatNotifier wechatNotifier = new WechatNotifier(Notify_SCKEY);
+                            if (wechatNotify.Checked)
+                            {
+                                int i = 1;
+                                for( ; i <= retry; i++)
+                                {
+                                    if(wechatNotifier.SendNotifier(title, content))
+                                    {
+                                        break;
+                                    }
+                                }
+                                if(i > retry)
+                                {
+                                    Console.WriteLine("微信提醒失败，请检查 SCKEY 是否填写正确");
+                                }
+                            }
+
+                            // Create Warning Messagebox
                             WarningMessageBox msg = new WarningMessageBox(share, warningType, lvi.SubItems[subitemIndex_DownPrice].Text, this);
                             msg.Show();
                         }
+
+                        // Play sound
                         warningdPlayer.Play();
                     }
                     else lvi.ForeColor = Color.Black;
@@ -460,6 +511,41 @@ namespace TraderHelper
         public void WakeUp()
         {
             this.WindowState = FormWindowState.Normal;
+        }
+
+        private void wechatNotify_Click(object sender, EventArgs e)
+        {
+            // 取消选择不做处理
+            if (!wechatNotify.Checked) return;
+
+            bool avai = false;
+            if (File.Exists(wechatNotifyPath))
+            {
+                using (StreamReader streamReader = new StreamReader(wechatNotifyPath))
+                {
+                    string SCKEY = streamReader.ReadLine();
+                    if (null != SCKEY && !SCKEY.Equals(""))
+                    {
+                        Notify_SCKEY = SCKEY;
+                        Console.WriteLine(Notify_SCKEY);
+                        avai = true;
+                    }
+                }
+            }
+
+            if (!avai)
+            {
+                wechatNotify.Checked = false;
+
+                using (StreamWriter streamWriter = new StreamWriter(wechatNotifyPath))
+                {
+                    streamWriter.Write("");
+                }
+
+                Process.Start(wechatNotifyPath);
+
+                MessageBox.Show(@"要开启微信提醒，请先在配置文件 [serverChan.ini] 中写入 SCKEY（可在 sc.ftqq.com 获取）", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
+            }
         }
     }
 }

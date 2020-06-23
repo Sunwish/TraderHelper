@@ -51,6 +51,7 @@
             this.DivideLine = new System.Windows.Forms.GroupBox();
             this.UpDownPriceConfigPanal = new System.Windows.Forms.Panel();
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
+            this.wechatNotify = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_StockImage)).BeginInit();
             this.UpDownPriceConfigPanal.SuspendLayout();
             this.SuspendLayout();
@@ -105,6 +106,7 @@
             this.PriceDown});
             this.listView_StockList.Cursor = System.Windows.Forms.Cursors.Default;
             this.listView_StockList.FullRowSelect = true;
+            this.listView_StockList.HideSelection = false;
             this.listView_StockList.Location = new System.Drawing.Point(33, 335);
             this.listView_StockList.MultiSelect = false;
             this.listView_StockList.Name = "listView_StockList";
@@ -143,7 +145,7 @@
             // 
             // button_StockListItemOperate
             // 
-            this.button_StockListItemOperate.Location = new System.Drawing.Point(545, 224);
+            this.button_StockListItemOperate.Location = new System.Drawing.Point(545, 251);
             this.button_StockListItemOperate.Name = "button_StockListItemOperate";
             this.button_StockListItemOperate.Size = new System.Drawing.Size(208, 42);
             this.button_StockListItemOperate.TabIndex = 7;
@@ -223,7 +225,7 @@
             // 
             // DivideLine
             // 
-            this.DivideLine.Location = new System.Drawing.Point(527, 295);
+            this.DivideLine.Location = new System.Drawing.Point(527, 301);
             this.DivideLine.Name = "DivideLine";
             this.DivideLine.Size = new System.Drawing.Size(244, 10);
             this.DivideLine.TabIndex = 15;
@@ -251,12 +253,24 @@
             this.notifyIcon1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.notifyIcon1_MouseClick);
             this.notifyIcon1.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.notifyIcon1_MouseClick);
             // 
+            // wechatNotify
+            // 
+            this.wechatNotify.AutoSize = true;
+            this.wechatNotify.Location = new System.Drawing.Point(573, 222);
+            this.wechatNotify.Name = "wechatNotify";
+            this.wechatNotify.Size = new System.Drawing.Size(89, 19);
+            this.wechatNotify.TabIndex = 17;
+            this.wechatNotify.Text = "微信提醒";
+            this.wechatNotify.UseVisualStyleBackColor = true;
+            this.wechatNotify.Click += new System.EventHandler(this.wechatNotify_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(786, 520);
+            this.Controls.Add(this.wechatNotify);
             this.Controls.Add(this.DivideLine);
             this.Controls.Add(this.button_StockListItemOperate);
             this.Controls.Add(this.listView_StockList);
@@ -300,6 +314,7 @@
         private System.Windows.Forms.GroupBox DivideLine;
         private System.Windows.Forms.Panel UpDownPriceConfigPanal;
         private System.Windows.Forms.NotifyIcon notifyIcon1;
+        private System.Windows.Forms.CheckBox wechatNotify;
     }
 }
 
