@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace TraderHelper
 {
@@ -48,11 +49,49 @@ namespace TraderHelper
             string requestURL = MakeShareResponseURL(shareInfo.shareUrlHeader, shareInfo.shareUrlType, shareInfo.shareUrlCode);
             string httpResponse = Helper.HttpResponse(requestURL, "GB2312");
 
-            // 取响应流有效信息
+            // 取响应流有效信息 (sina api response parse)
+            /*
             string reg1 = Helper.Regexer(@"(?<=.+=.).+(?=,)", httpResponse);
             string[] shareParams = reg1.Split(',');
             ShareData shareData = new TraderHelper.ShareData(shareParams);
 
+            if (shareParams.Length == 1) // 获取信息为空
+                throw new SystemException("[Exception] UpdateShareDataFromShareInfo: 信息获取错误;");
+            */
+
+            // 取响应流有效信息 (163 api response parse)
+            string reg1 = "{" +  Helper.Regexer(@"(?<=:{).+(?=})", httpResponse);
+            reg1 = reg1.Replace('"', '\'');
+            _ntes_quote_callback res = JsonConvert.DeserializeObject<_ntes_quote_callback>(reg1);
+            string[] shareParams = new string[32];
+            shareParams[0] = res.name;
+            shareParams[1] = res.open.ToString();
+            shareParams[2] = res.yestclose.ToString();
+            shareParams[3] = res.price.ToString();
+            shareParams[4] = res.high.ToString();
+            shareParams[5] = res.low.ToString();
+            shareParams[6] = res.bid1.ToString();
+            shareParams[13] = res.bid2.ToString();
+            shareParams[15] = res.bid3.ToString();
+            shareParams[17] = res.bid4.ToString();
+            shareParams[19] = res.bid5.ToString();
+            shareParams[7] = res.ask1.ToString();
+            shareParams[23] = res.ask2.ToString();
+            shareParams[25] = res.ask3.ToString();
+            shareParams[27] = res.ask4.ToString();
+            shareParams[29] = res.ask5.ToString();
+            shareParams[10] = res.bidvol1.ToString();
+            shareParams[12] = res.bidvol2.ToString();
+            shareParams[14] = res.bidvol3.ToString();
+            shareParams[16] = res.bidvol4.ToString();
+            shareParams[18] = res.bidvol5.ToString();
+            shareParams[20] = res.askvol1.ToString();
+            shareParams[22] = res.askvol2.ToString();
+            shareParams[24] = res.askvol3.ToString();
+            shareParams[26] = res.askvol4.ToString();
+            shareParams[28] = res.askvol5.ToString();
+            shareParams[31] = res.time;
+            ShareData shareData = new TraderHelper.ShareData(shareParams);
             if (shareParams.Length == 1) // 获取信息为空
                 throw new SystemException("[Exception] UpdateShareDataFromShareInfo: 信息获取错误;");
 

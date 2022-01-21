@@ -21,7 +21,8 @@ namespace TraderHelper
         const int GCTime = 3;  // GC时间间隔(s), 计时依赖于timer
         const string DefaultCode = "000001";
         const string Formtitle = "Trader Helper";
-        const string httpHeader = "http://hq.sinajs.cn/list=";
+        //const string httpHeader = "http://hq.sinajs.cn/list=";
+        const string httpHeader = "http://api.money.126.net/data/feed/";
         const string httpImageHeader = "http://image.sinajs.cn/newchart/min/n/";
         const string stockListFilePath = @"stockList.ini";
         const string wechatNotifyPath = @"serverChan.ini";
@@ -204,11 +205,26 @@ namespace TraderHelper
             return ((currentTime >= 9 * 60 && currentTime < 11 * 60 + 30) || (currentTime >= 13 * 60 && currentTime < 15 * 60));
         }
 
-        private string GetShareTypeByCode(string shareCode)
+        private string GetShareTypeByCode(string shareCode, string apiType = "163")
         {
+            string sz = "sz";
+            string sh = "sh";
+            if (apiType == "sina")
+            {
+                // sina api type
+                sz = "sz";
+                sh = "sh";
+            }
+            else if (apiType == "163")
+            {
+                // 163 api type
+                sz = "1";
+                sh = "0";
+            }
+
             if (shareCode == DefaultCode)
-                return "sh";
-            return shareCode.First() == '0' ? "sz" : "sh";
+                return sh;
+            return ((shareCode.First() == '0') || shareCode.First() == '3') ? sz : sh;
         }
 
         private Share GetShareByCode(string shareCode)
@@ -221,7 +237,7 @@ namespace TraderHelper
         private Image GetShareImgByCode(string shareCode)
         {
             // Get Share real-time image 
-            string shareType = GetShareTypeByCode(shareCode);
+            string shareType = GetShareTypeByCode(shareCode, "sina");
             return Helper.HttpRequestImage(httpImageHeader + shareType + shareCode + ".gif");
         }
 
