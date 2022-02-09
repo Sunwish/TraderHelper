@@ -125,19 +125,19 @@ namespace TraderHelper
             if (!File.Exists(stockListFilePath))
                 using (StreamWriter streamWriter = new StreamWriter(stockListFilePath))
                     streamWriter.Write("");
-                using (StreamReader streamReader = new StreamReader(stockListFilePath))
+            using (StreamReader streamReader = new StreamReader(stockListFilePath))
+            {
+                string line = streamReader.ReadLine();
+                string first = line;
+                Share share = null;
+                while (line != null)
                 {
-                    string line = streamReader.ReadLine();
-                    string first = line;
-                    Share share = null;
-                    while (line != null)
-                    {
-                        share = GetShareByCode(line);
-                        Add2StockList(share.shareInfo.shareUrlCode, share.shareData.shareName, "", share.shareData.currentPrice, "");
-                        line = streamReader.ReadLine();
-                    }
-                    return first;
+                    share = GetShareByCode(line);
+                    Add2StockList(share.shareInfo.shareUrlCode, share.shareData.shareName, "", share.shareData.currentPrice, "");
+                    line = streamReader.ReadLine();
                 }
+                return first;
+            }
         }
 
         private bool Get2DisplayShareInfomationByCode(string code, bool getFully = false)
@@ -148,6 +148,7 @@ namespace TraderHelper
             {
                 // Get Share Data
                 Share share = GetShareByCode(code);
+                if (share.shareData == null) throw new Exception("Get share data failed!");
                  
                 // Update Information Panal Text
                 string outputString = "股票名称: " + share.shareData.shareName + "\n现价:" + share.shareData.currentPrice + "\n买一: " + share.shareData.buyPrice[0] + "\n卖一:" + share.shareData.sellPrice[0] + "\n数据时间: " + share.shareData.dataTime;
@@ -184,7 +185,7 @@ namespace TraderHelper
 
                 return true;
             }
-            catch (SystemException exception)
+            catch (Exception exception)
             {
                 UpDownPriceConfigPanal.Enabled = false;
                 button_StockListItemOperate.Enabled = false;
@@ -330,7 +331,7 @@ namespace TraderHelper
                     else lvi.ForeColor = Color.Black;
                 }
             }
-            
+
             // Update Infomation Panal
             if (Get2DisplayShareInfomationByCode(textBox_StockCode.Text))
                 this.Text = Formtitle + " (Stock data has update: " + System.DateTime.Now.ToLongDateString() + " " + System.DateTime.Now.ToLongTimeString() + " )";

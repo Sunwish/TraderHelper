@@ -62,7 +62,14 @@ namespace TraderHelper
             // 取响应流有效信息 (163 api response parse)
             string reg1 = "{" +  Helper.Regexer(@"(?<=:{).+(?=})", httpResponse);
             reg1 = reg1.Replace('"', '\'');
-            _ntes_quote_callback res = JsonConvert.DeserializeObject<_ntes_quote_callback>(reg1);
+            _ntes_quote_callback res;
+            try
+            {
+                res = JsonConvert.DeserializeObject<_ntes_quote_callback>(reg1);
+            } catch (Exception)
+            {
+                return null;
+            }
             string[] shareParams = new string[32];
             shareParams[0] = res.name;
             shareParams[1] = res.open.ToString();
