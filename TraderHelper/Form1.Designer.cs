@@ -273,7 +273,7 @@
             this.pushdeerNotify.Name = "pushdeerNotify";
             this.pushdeerNotify.Size = new System.Drawing.Size(93, 19);
             this.pushdeerNotify.TabIndex = 18;
-            this.pushdeerNotify.Text = "pushdeer";
+            this.pushdeerNotify.Text = "PushDeer";
             this.pushdeerNotify.UseVisualStyleBackColor = true;
             this.pushdeerNotify.CheckedChanged += new System.EventHandler(this.pushdeerNotify_CheckedChanged);
             // 

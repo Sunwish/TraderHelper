@@ -103,6 +103,20 @@ namespace TraderHelper
             }
             */
 
+            // Load pushdeer notify settings
+            if (File.Exists(pushdeerNotifyPath))
+            {
+                using (StreamReader streamReader = new StreamReader(pushdeerNotifyPath))
+                {
+                    string PUSHKEY = streamReader.ReadLine();
+                    if (null != PUSHKEY && !PUSHKEY.Equals(""))
+                    {
+                        Notify_PUSHKEY = PUSHKEY;
+                        pushdeerNotify.Checked = true;
+                    }
+                }
+            }
+
             // Display Data
             Get2DisplayShareInfomationByCode(code, true);
 
@@ -615,7 +629,7 @@ namespace TraderHelper
                 Process.Start(pushdeerNotifyPath);
                 Process.Start(@"pushdeer.png");
 
-                MessageBox.Show(@"要开启 Pushdeer 提醒，请先在配置文件 [pushdeer.ini] 中写入 KEY", "提示（该提醒方式仅限苹果设备使用）", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
+                MessageBox.Show("要开启 PushDeer 提醒，请先在配置文件 [pushdeer.ini] 中写入 KEY。\n安卓版请前往：https://github.com/easychen/pushdeer/releases 下载", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
             }
 
         }
