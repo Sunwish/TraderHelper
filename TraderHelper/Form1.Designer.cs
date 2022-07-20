@@ -52,6 +52,7 @@
             this.UpDownPriceConfigPanal = new System.Windows.Forms.Panel();
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.wechatNotify = new System.Windows.Forms.CheckBox();
+            this.pushdeerNotify = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_StockImage)).BeginInit();
             this.UpDownPriceConfigPanal.SuspendLayout();
             this.SuspendLayout();
@@ -60,7 +61,7 @@
             // 
             this.textBox_StockCode.Location = new System.Drawing.Point(644, 27);
             this.textBox_StockCode.Name = "textBox_StockCode";
-            this.textBox_StockCode.Size = new System.Drawing.Size(114, 25);
+            this.textBox_StockCode.Size = new System.Drawing.Size(127, 25);
             this.textBox_StockCode.TabIndex = 0;
             this.textBox_StockCode.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.textBox_StockCode.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
@@ -73,7 +74,7 @@
             this.textBox_StockInformation.Multiline = true;
             this.textBox_StockInformation.Name = "textBox_StockInformation";
             this.textBox_StockInformation.ReadOnly = true;
-            this.textBox_StockInformation.Size = new System.Drawing.Size(180, 148);
+            this.textBox_StockInformation.Size = new System.Drawing.Size(265, 148);
             this.textBox_StockInformation.TabIndex = 2;
             // 
             // label1
@@ -89,6 +90,7 @@
             // pictureBox_StockImage
             // 
             this.pictureBox_StockImage.BackColor = System.Drawing.Color.White;
+            this.pictureBox_StockImage.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.pictureBox_StockImage.Location = new System.Drawing.Point(9, 25);
             this.pictureBox_StockImage.Name = "pictureBox_StockImage";
             this.pictureBox_StockImage.Size = new System.Drawing.Size(544, 304);
@@ -145,9 +147,9 @@
             // 
             // button_StockListItemOperate
             // 
-            this.button_StockListItemOperate.Location = new System.Drawing.Point(545, 251);
+            this.button_StockListItemOperate.Location = new System.Drawing.Point(573, 251);
             this.button_StockListItemOperate.Name = "button_StockListItemOperate";
-            this.button_StockListItemOperate.Size = new System.Drawing.Size(208, 42);
+            this.button_StockListItemOperate.Size = new System.Drawing.Size(198, 42);
             this.button_StockListItemOperate.TabIndex = 7;
             this.button_StockListItemOperate.Text = "添加到自选股";
             this.button_StockListItemOperate.UseVisualStyleBackColor = true;
@@ -167,7 +169,7 @@
             // 
             this.textBox_PriceSettingUp.Location = new System.Drawing.Point(73, 55);
             this.textBox_PriceSettingUp.Name = "textBox_PriceSettingUp";
-            this.textBox_PriceSettingUp.Size = new System.Drawing.Size(152, 25);
+            this.textBox_PriceSettingUp.Size = new System.Drawing.Size(171, 25);
             this.textBox_PriceSettingUp.TabIndex = 9;
             this.textBox_PriceSettingUp.Tag = "up";
             this.textBox_PriceSettingUp.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -177,7 +179,7 @@
             // 
             this.textBox_PriceSettingDown.Location = new System.Drawing.Point(73, 96);
             this.textBox_PriceSettingDown.Name = "textBox_PriceSettingDown";
-            this.textBox_PriceSettingDown.Size = new System.Drawing.Size(152, 25);
+            this.textBox_PriceSettingDown.Size = new System.Drawing.Size(171, 25);
             this.textBox_PriceSettingDown.TabIndex = 11;
             this.textBox_PriceSettingDown.Tag = "down";
             this.textBox_PriceSettingDown.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -199,7 +201,7 @@
             this.textBox_PriceSettingCurrent.Enabled = false;
             this.textBox_PriceSettingCurrent.Location = new System.Drawing.Point(73, 15);
             this.textBox_PriceSettingCurrent.Name = "textBox_PriceSettingCurrent";
-            this.textBox_PriceSettingCurrent.Size = new System.Drawing.Size(152, 25);
+            this.textBox_PriceSettingCurrent.Size = new System.Drawing.Size(171, 25);
             this.textBox_PriceSettingCurrent.TabIndex = 13;
             this.textBox_PriceSettingCurrent.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
@@ -217,7 +219,7 @@
             // 
             this.button_PriceSettingConfirm.Location = new System.Drawing.Point(17, 135);
             this.button_PriceSettingConfirm.Name = "button_PriceSettingConfirm";
-            this.button_PriceSettingConfirm.Size = new System.Drawing.Size(208, 42);
+            this.button_PriceSettingConfirm.Size = new System.Drawing.Size(227, 42);
             this.button_PriceSettingConfirm.TabIndex = 14;
             this.button_PriceSettingConfirm.Text = "确认设置";
             this.button_PriceSettingConfirm.UseVisualStyleBackColor = true;
@@ -242,7 +244,7 @@
             this.UpDownPriceConfigPanal.Controls.Add(this.textBox_PriceSettingDown);
             this.UpDownPriceConfigPanal.Location = new System.Drawing.Point(527, 319);
             this.UpDownPriceConfigPanal.Name = "UpDownPriceConfigPanal";
-            this.UpDownPriceConfigPanal.Size = new System.Drawing.Size(247, 189);
+            this.UpDownPriceConfigPanal.Size = new System.Drawing.Size(273, 189);
             this.UpDownPriceConfigPanal.TabIndex = 16;
             // 
             // notifyIcon1
@@ -264,12 +266,24 @@
             this.wechatNotify.UseVisualStyleBackColor = true;
             this.wechatNotify.Click += new System.EventHandler(this.wechatNotify_Click);
             // 
+            // pushdeerNotify
+            // 
+            this.pushdeerNotify.AutoSize = true;
+            this.pushdeerNotify.Location = new System.Drawing.Point(669, 222);
+            this.pushdeerNotify.Name = "pushdeerNotify";
+            this.pushdeerNotify.Size = new System.Drawing.Size(93, 19);
+            this.pushdeerNotify.TabIndex = 18;
+            this.pushdeerNotify.Text = "pushdeer";
+            this.pushdeerNotify.UseVisualStyleBackColor = true;
+            this.pushdeerNotify.CheckedChanged += new System.EventHandler(this.pushdeerNotify_CheckedChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(786, 520);
+            this.ClientSize = new System.Drawing.Size(827, 520);
+            this.Controls.Add(this.pushdeerNotify);
             this.Controls.Add(this.wechatNotify);
             this.Controls.Add(this.DivideLine);
             this.Controls.Add(this.button_StockListItemOperate);
@@ -315,6 +329,7 @@
         private System.Windows.Forms.Panel UpDownPriceConfigPanal;
         private System.Windows.Forms.NotifyIcon notifyIcon1;
         private System.Windows.Forms.CheckBox wechatNotify;
+        private System.Windows.Forms.CheckBox pushdeerNotify;
     }
 }
 

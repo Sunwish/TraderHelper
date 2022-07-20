@@ -16,6 +16,7 @@ namespace TraderHelper
     public partial class Form1 : Form
     {
         string Notify_SCKEY = "";
+        string Notify_PUSHKEY = "";
         int buttonType = 0; // 0.添加到自选股 1.从自选股移除
         int GCTimeFlow; // GC计时变量(s), 计时依赖于timer
         const int GCTime = 3;  // GC时间间隔(s), 计时依赖于timer
@@ -26,6 +27,8 @@ namespace TraderHelper
         const string httpImageHeader = "http://image.sinajs.cn/newchart/min/n/";
         const string stockListFilePath = @"stockList.ini";
         const string wechatNotifyPath = @"serverChan.ini";
+        const string pushdeerNotifyPath = @"pushdeer.ini";
+        const string pushdeerBaseUrl = @"http://notify.houkaifa.com/message/push?";
         const string stockUpDownPriceDirectoryPath = @"stocksConfig";
         int currentIndex = -1;
         const int subitemIndex_UpPrice = 2;
@@ -301,7 +304,7 @@ namespace TraderHelper
                         {
                             // Wechat notify
                             int retry = 3;
-                            string title = "[" + share.shareInfo.shareUrlCode + "] " + share.shareData.shareName + " 触发" + (warningType == 0 ? "上" : "下") + "破价格 " + lvi.SubItems[subitemIndex_DownPrice].Text;
+                            string title = "[" + share.shareInfo.shareUrlCode + "] " + share.shareData.shareName + " 触发" + (warningType == 0 ? "上" : "下") + "破价格 " + (warningType == 0 ? lvi.SubItems[subitemIndex_UpPrice].Text : lvi.SubItems[subitemIndex_DownPrice].Text);
                             string content = title + ", 现价 " + share.shareData.currentPrice;
                             WechatNotifier wechatNotifier = new WechatNotifier(Notify_SCKEY);
                             if (wechatNotify.Checked)
@@ -318,6 +321,21 @@ namespace TraderHelper
                                 {
                                     Console.WriteLine("微信提醒失败，请检查 SCKEY 是否填写正确");
                                 }
+                            }
+
+                            // Pushdeer notify
+                            if (pushdeerNotify.Checked)
+                            {
+                                string wdirection = "上破";
+                                string warrow = "↑";
+                                string wprice = lvi.SubItems[subitemIndex_UpPrice].Text;
+                                if (warningType != 0)
+                                {
+                                    wdirection = "下破";
+                                    warrow = "↓";
+                                    wprice = lvi.SubItems[subitemIndex_DownPrice].Text;
+                                }
+                                Helper.HttpResponseStream(pushdeerBaseUrl + @"pushkey=" + Notify_PUSHKEY + "&text=[" + share.shareInfo.shareUrlCode + "] " + share.shareData.shareName + " " + wdirection + " " + wprice +  " " + warrow);
                             }
 
                             // Create Warning Messagebox
@@ -563,6 +581,43 @@ namespace TraderHelper
 
                 MessageBox.Show(@"要开启微信提醒，请先在配置文件 [serverChan.ini] 中写入 SCKEY（可在 sc.ftqq.com 获取）", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
             }
+        }
+
+        private void pushdeerNotify_CheckedChanged(object sender, EventArgs e)
+        {
+            // 取消选择不做处理
+            if (!pushdeerNotify.Checked) return;
+
+            bool avai = false;
+            if (File.Exists(pushdeerNotifyPath))
+            {
+                using (StreamReader streamReader = new StreamReader(pushdeerNotifyPath))
+                {
+                    string PUSHKEY = streamReader.ReadLine();
+                    if (null != PUSHKEY && !PUSHKEY.Equals(""))
+                    {
+                        Notify_PUSHKEY = PUSHKEY;
+                        Console.WriteLine(Notify_PUSHKEY);
+                        avai = true;
+                    }
+                }
+            }
+
+            if (!avai)
+            {
+                pushdeerNotify.Checked = false;
+
+                using (StreamWriter streamWriter = new StreamWriter(pushdeerNotifyPath))
+                {
+                    streamWriter.Write("");
+                }
+
+                Process.Start(pushdeerNotifyPath);
+                Process.Start(@"pushdeer.png");
+
+                MessageBox.Show(@"要开启 Pushdeer 提醒，请先在配置文件 [pushdeer.ini] 中写入 KEY", "提示（该提醒方式仅限苹果设备使用）", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
+            }
+
         }
     }
 }
