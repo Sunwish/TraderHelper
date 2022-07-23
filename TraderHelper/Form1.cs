@@ -353,7 +353,7 @@ namespace TraderHelper
                             }
 
                             // Create Warning Messagebox
-                            WarningMessageBox msg = new WarningMessageBox(share, warningType, lvi.SubItems[subitemIndex_DownPrice].Text, this);
+                            WarningMessageBox msg = new WarningMessageBox(share, warningType, (warningType == 0 ? lvi.SubItems[subitemIndex_UpPrice].Text : lvi.SubItems[subitemIndex_DownPrice].Text), this);
                             msg.Show();
                         }
 
@@ -627,9 +627,16 @@ namespace TraderHelper
                 }
 
                 Process.Start(pushdeerNotifyPath);
-                Process.Start(@"pushdeer.png");
+                bool pngExist = File.Exists(@"pushdeer.png");
+                if (pngExist)
+                {
+                   Process.Start(@"pushdeer.png");
+                } else
+                {
+                    Process.Start("explorer.exe", "http://notify.houkaifa.com/"); ;
+                }
 
-                MessageBox.Show("要开启 PushDeer 提醒，请先在配置文件 [pushdeer.ini] 中写入 KEY。\n安卓版请前往：https://github.com/easychen/pushdeer/releases 下载", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
+                MessageBox.Show("要开启 PushDeer 提醒，请先在配置文件 [pushdeer.ini] 中写入 KEY。\n请在弹出的" + (pngExist ? "图片" : "网页") + "中使用 iOS14+ 自带相机扫码，在弹出的轻应用中输入 URL 为：http://notify.houkaifa.com，\n然后登录绑定，得到用于通知的 Key。\n轻应用若30天未使用需要重新更新授权，故若长期使用请扫码后在弹出的卡片底部进入 App Store 下载使用。\n安卓版请前往：https://github.com/easychen/pushdeer/releases 下载。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
             }
 
         }
