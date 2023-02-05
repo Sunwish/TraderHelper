@@ -23,31 +23,52 @@ namespace TraderHelper
         }
 
         // 从shareInfo静态创建一个Share实例
-        public static Share CreateFromShareInfo(ShareInfo shareInfo)
+        public static async Task<Share> CreateFromShareInfo(ShareInfo shareInfo)
         {
             Share share = new Share();
             share.shareInfo = ShareInfo.Build(shareInfo);
-            share.shareData = GetShareDataFromShareInfo(shareInfo);
-
+            try
+            {
+                share.shareData = await GetShareDataFromShareInfo(shareInfo);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
             return share;
         }
 
         // 从shareInfo静态创建一个Share实例
-        public static Share CreateFromShareInfo(string shareUrlHeader, string shareUrlType, string shareUrlCode)
+        public static async Task<Share> CreateFromShareInfo(string shareUrlHeader, string shareUrlType, string shareUrlCode)
         {
             Share share = new Share();
             share.shareInfo = ShareInfo.Build(shareUrlHeader, shareUrlType, shareUrlCode);
-            share.shareData = GetShareDataFromShareInfo(share.shareInfo);
-
+            try
+            {
+                share.shareData = await GetShareDataFromShareInfo(share.shareInfo);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
             return share;
         }
 
         // 从指定shareInfo获取最新shareData
-        private static ShareData GetShareDataFromShareInfo(ShareInfo shareInfo)
+        private static async Task<ShareData> GetShareDataFromShareInfo(ShareInfo shareInfo)
         {
             // 获取http响应
             string requestURL = MakeShareResponseURL(shareInfo.shareUrlHeader, shareInfo.shareUrlType, shareInfo.shareUrlCode);
-            string httpResponse = Helper.HttpResponse(requestURL, "GB2312");
+            string httpResponse = "";
+            try
+            {
+                httpResponse = await Helper.HttpResponse(requestURL, "GB2312");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            
 
             // 取响应流有效信息 (sina api response parse)
             /*
@@ -106,9 +127,18 @@ namespace TraderHelper
         }
 
         // 从自身shareInfo获取最新ShareData
-        private ShareData GetShareDataFromShareInfo()
+        private async Task<ShareData> GetShareDataFromShareInfo()
         {
-            return GetShareDataFromShareInfo(this.shareInfo);
+            ShareData shareData = null;
+            try
+            {
+                shareData = await GetShareDataFromShareInfo(this.shareInfo);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return shareData;
         }
 
         // 组合请求URL

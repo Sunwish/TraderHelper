@@ -11,26 +11,41 @@ namespace TraderHelper
 {
     class Helper
     {
-        public static string HttpResponse(string url, string encoding)
+        public static async Task<string> HttpResponse(string url, string encoding)
         {
-            // 获取响应流并读取数据
-            using (System.IO.Stream httpStream = HttpResponseStream(url))
-            using (System.IO.StreamReader streamReader = new System.IO.StreamReader(httpStream, Encoding.GetEncoding(encoding)))
+            try
             {
-                // 返回响应数据
-                return streamReader.ReadToEnd();
+                // 获取响应流并读取数据
+                using (System.IO.Stream httpStream = HttpResponseStream(url))
+                using (System.IO.StreamReader streamReader = new System.IO.StreamReader(httpStream, Encoding.GetEncoding(encoding)))
+                {
+                    // 返回响应数据
+                    return await streamReader.ReadToEndAsync();
+                }
             }
+            catch (Exception)
+            {
+                throw;
+            }
+            
         }
         
         public static System.IO.Stream HttpResponseStream(string url)
         {
             // 创建 HttpWeb 请求并接收相应
             HttpWebRequest httpRequst = WebRequest.Create(url) as HttpWebRequest;
-            HttpWebResponse httpResponse = httpRequst.GetResponse() as HttpWebResponse;
-            
-            // 返回响应流
-            return httpResponse.GetResponseStream();
-                            
+            try
+            {
+                HttpWebResponse httpResponse = httpRequst.GetResponse() as HttpWebResponse;
+
+                // 返回响应流
+                return httpResponse.GetResponseStream();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }   
         }
         
         public static System.Drawing.Image HttpRequestImage(string url)

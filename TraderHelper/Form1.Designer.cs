@@ -59,9 +59,10 @@
             // 
             // textBox_StockCode
             // 
-            this.textBox_StockCode.Location = new System.Drawing.Point(644, 27);
+            this.textBox_StockCode.Location = new System.Drawing.Point(966, 43);
+            this.textBox_StockCode.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.textBox_StockCode.Name = "textBox_StockCode";
-            this.textBox_StockCode.Size = new System.Drawing.Size(127, 25);
+            this.textBox_StockCode.Size = new System.Drawing.Size(188, 35);
             this.textBox_StockCode.TabIndex = 0;
             this.textBox_StockCode.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.textBox_StockCode.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
@@ -70,20 +71,22 @@
             // 
             this.textBox_StockInformation.BackColor = System.Drawing.Color.White;
             this.textBox_StockInformation.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.textBox_StockInformation.Location = new System.Drawing.Point(573, 70);
+            this.textBox_StockInformation.Location = new System.Drawing.Point(860, 112);
+            this.textBox_StockInformation.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.textBox_StockInformation.Multiline = true;
             this.textBox_StockInformation.Name = "textBox_StockInformation";
             this.textBox_StockInformation.ReadOnly = true;
-            this.textBox_StockInformation.Size = new System.Drawing.Size(265, 148);
+            this.textBox_StockInformation.Size = new System.Drawing.Size(398, 237);
             this.textBox_StockInformation.TabIndex = 2;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label1.Location = new System.Drawing.Point(569, 31);
+            this.label1.Location = new System.Drawing.Point(854, 50);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(69, 19);
+            this.label1.Size = new System.Drawing.Size(110, 31);
             this.label1.TabIndex = 3;
             this.label1.Text = "股票代码";
             // 
@@ -91,9 +94,10 @@
             // 
             this.pictureBox_StockImage.BackColor = System.Drawing.Color.White;
             this.pictureBox_StockImage.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.pictureBox_StockImage.Location = new System.Drawing.Point(9, 25);
+            this.pictureBox_StockImage.Location = new System.Drawing.Point(14, 40);
+            this.pictureBox_StockImage.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.pictureBox_StockImage.Name = "pictureBox_StockImage";
-            this.pictureBox_StockImage.Size = new System.Drawing.Size(544, 304);
+            this.pictureBox_StockImage.Size = new System.Drawing.Size(816, 486);
             this.pictureBox_StockImage.TabIndex = 4;
             this.pictureBox_StockImage.TabStop = false;
             // 
@@ -109,10 +113,11 @@
             this.listView_StockList.Cursor = System.Windows.Forms.Cursors.Default;
             this.listView_StockList.FullRowSelect = true;
             this.listView_StockList.HideSelection = false;
-            this.listView_StockList.Location = new System.Drawing.Point(33, 335);
+            this.listView_StockList.Location = new System.Drawing.Point(50, 536);
+            this.listView_StockList.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.listView_StockList.MultiSelect = false;
             this.listView_StockList.Name = "listView_StockList";
-            this.listView_StockList.Size = new System.Drawing.Size(470, 162);
+            this.listView_StockList.Size = new System.Drawing.Size(703, 257);
             this.listView_StockList.TabIndex = 5;
             this.listView_StockList.UseCompatibleStateImageBehavior = false;
             this.listView_StockList.View = System.Windows.Forms.View.Details;
@@ -147,9 +152,10 @@
             // 
             // button_StockListItemOperate
             // 
-            this.button_StockListItemOperate.Location = new System.Drawing.Point(573, 251);
+            this.button_StockListItemOperate.Location = new System.Drawing.Point(860, 402);
+            this.button_StockListItemOperate.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.button_StockListItemOperate.Name = "button_StockListItemOperate";
-            this.button_StockListItemOperate.Size = new System.Drawing.Size(198, 42);
+            this.button_StockListItemOperate.Size = new System.Drawing.Size(297, 67);
             this.button_StockListItemOperate.TabIndex = 7;
             this.button_StockListItemOperate.Text = "添加到自选股";
             this.button_StockListItemOperate.UseVisualStyleBackColor = true;
@@ -159,17 +165,19 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label2.Location = new System.Drawing.Point(13, 59);
+            this.label2.Location = new System.Drawing.Point(20, 94);
+            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(54, 19);
+            this.label2.Size = new System.Drawing.Size(86, 31);
             this.label2.TabIndex = 8;
             this.label2.Text = "上破价";
             // 
             // textBox_PriceSettingUp
             // 
-            this.textBox_PriceSettingUp.Location = new System.Drawing.Point(73, 55);
+            this.textBox_PriceSettingUp.Location = new System.Drawing.Point(110, 88);
+            this.textBox_PriceSettingUp.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.textBox_PriceSettingUp.Name = "textBox_PriceSettingUp";
-            this.textBox_PriceSettingUp.Size = new System.Drawing.Size(171, 25);
+            this.textBox_PriceSettingUp.Size = new System.Drawing.Size(254, 35);
             this.textBox_PriceSettingUp.TabIndex = 9;
             this.textBox_PriceSettingUp.Tag = "up";
             this.textBox_PriceSettingUp.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -177,9 +185,10 @@
             // 
             // textBox_PriceSettingDown
             // 
-            this.textBox_PriceSettingDown.Location = new System.Drawing.Point(73, 96);
+            this.textBox_PriceSettingDown.Location = new System.Drawing.Point(110, 154);
+            this.textBox_PriceSettingDown.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.textBox_PriceSettingDown.Name = "textBox_PriceSettingDown";
-            this.textBox_PriceSettingDown.Size = new System.Drawing.Size(171, 25);
+            this.textBox_PriceSettingDown.Size = new System.Drawing.Size(254, 35);
             this.textBox_PriceSettingDown.TabIndex = 11;
             this.textBox_PriceSettingDown.Tag = "down";
             this.textBox_PriceSettingDown.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -189,9 +198,10 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label3.Location = new System.Drawing.Point(13, 100);
+            this.label3.Location = new System.Drawing.Point(20, 160);
+            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(54, 19);
+            this.label3.Size = new System.Drawing.Size(86, 31);
             this.label3.TabIndex = 10;
             this.label3.Text = "下破价";
             // 
@@ -199,9 +209,10 @@
             // 
             this.textBox_PriceSettingCurrent.AccessibleRole = System.Windows.Forms.AccessibleRole.PageTabList;
             this.textBox_PriceSettingCurrent.Enabled = false;
-            this.textBox_PriceSettingCurrent.Location = new System.Drawing.Point(73, 15);
+            this.textBox_PriceSettingCurrent.Location = new System.Drawing.Point(110, 24);
+            this.textBox_PriceSettingCurrent.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.textBox_PriceSettingCurrent.Name = "textBox_PriceSettingCurrent";
-            this.textBox_PriceSettingCurrent.Size = new System.Drawing.Size(171, 25);
+            this.textBox_PriceSettingCurrent.Size = new System.Drawing.Size(254, 35);
             this.textBox_PriceSettingCurrent.TabIndex = 13;
             this.textBox_PriceSettingCurrent.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
@@ -209,17 +220,19 @@
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label4.Location = new System.Drawing.Point(21, 20);
+            this.label4.Location = new System.Drawing.Point(32, 32);
+            this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(39, 20);
+            this.label4.Size = new System.Drawing.Size(62, 31);
             this.label4.TabIndex = 12;
             this.label4.Text = "现价";
             // 
             // button_PriceSettingConfirm
             // 
-            this.button_PriceSettingConfirm.Location = new System.Drawing.Point(17, 135);
+            this.button_PriceSettingConfirm.Location = new System.Drawing.Point(26, 216);
+            this.button_PriceSettingConfirm.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.button_PriceSettingConfirm.Name = "button_PriceSettingConfirm";
-            this.button_PriceSettingConfirm.Size = new System.Drawing.Size(227, 42);
+            this.button_PriceSettingConfirm.Size = new System.Drawing.Size(340, 67);
             this.button_PriceSettingConfirm.TabIndex = 14;
             this.button_PriceSettingConfirm.Text = "确认设置";
             this.button_PriceSettingConfirm.UseVisualStyleBackColor = true;
@@ -227,9 +240,11 @@
             // 
             // DivideLine
             // 
-            this.DivideLine.Location = new System.Drawing.Point(527, 301);
+            this.DivideLine.Location = new System.Drawing.Point(790, 482);
+            this.DivideLine.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.DivideLine.Name = "DivideLine";
-            this.DivideLine.Size = new System.Drawing.Size(244, 10);
+            this.DivideLine.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.DivideLine.Size = new System.Drawing.Size(366, 16);
             this.DivideLine.TabIndex = 15;
             this.DivideLine.TabStop = false;
             // 
@@ -242,9 +257,10 @@
             this.UpDownPriceConfigPanal.Controls.Add(this.textBox_PriceSettingUp);
             this.UpDownPriceConfigPanal.Controls.Add(this.label3);
             this.UpDownPriceConfigPanal.Controls.Add(this.textBox_PriceSettingDown);
-            this.UpDownPriceConfigPanal.Location = new System.Drawing.Point(527, 319);
+            this.UpDownPriceConfigPanal.Location = new System.Drawing.Point(790, 510);
+            this.UpDownPriceConfigPanal.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.UpDownPriceConfigPanal.Name = "UpDownPriceConfigPanal";
-            this.UpDownPriceConfigPanal.Size = new System.Drawing.Size(273, 189);
+            this.UpDownPriceConfigPanal.Size = new System.Drawing.Size(410, 302);
             this.UpDownPriceConfigPanal.TabIndex = 16;
             // 
             // notifyIcon1
@@ -258,9 +274,10 @@
             // wechatNotify
             // 
             this.wechatNotify.AutoSize = true;
-            this.wechatNotify.Location = new System.Drawing.Point(573, 222);
+            this.wechatNotify.Location = new System.Drawing.Point(860, 355);
+            this.wechatNotify.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.wechatNotify.Name = "wechatNotify";
-            this.wechatNotify.Size = new System.Drawing.Size(89, 19);
+            this.wechatNotify.Size = new System.Drawing.Size(138, 28);
             this.wechatNotify.TabIndex = 17;
             this.wechatNotify.Text = "微信提醒";
             this.wechatNotify.UseVisualStyleBackColor = true;
@@ -269,9 +286,10 @@
             // pushdeerNotify
             // 
             this.pushdeerNotify.AutoSize = true;
-            this.pushdeerNotify.Location = new System.Drawing.Point(669, 222);
+            this.pushdeerNotify.Location = new System.Drawing.Point(1004, 355);
+            this.pushdeerNotify.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.pushdeerNotify.Name = "pushdeerNotify";
-            this.pushdeerNotify.Size = new System.Drawing.Size(93, 19);
+            this.pushdeerNotify.Size = new System.Drawing.Size(138, 28);
             this.pushdeerNotify.TabIndex = 18;
             this.pushdeerNotify.Text = "PushDeer";
             this.pushdeerNotify.UseVisualStyleBackColor = true;
@@ -279,10 +297,10 @@
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(827, 520);
+            this.ClientSize = new System.Drawing.Size(1240, 832);
             this.Controls.Add(this.pushdeerNotify);
             this.Controls.Add(this.wechatNotify);
             this.Controls.Add(this.DivideLine);
@@ -294,6 +312,7 @@
             this.Controls.Add(this.textBox_StockCode);
             this.Controls.Add(this.UpDownPriceConfigPanal);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "Form1";
             this.Text = "Trader Helper";
             this.Load += new System.EventHandler(this.Form1_Load);

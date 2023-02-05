@@ -19,7 +19,7 @@ namespace TraderHelper
         string warningPrice;
         int warningType;
         Form1 mainWindow;
-        public WarningMessageBox(Share bindShare, int warningType/* 0.UpWarning, 1.DownWarning */, string warningPrice, Form1 mainWindow)
+        public WarningMessageBox(Share bindShare, int warningType/* 0.UpWarning, 1.DownWarning, 2.Exception */, string warningPrice, Form1 mainWindow)
         {
             // Add share to bind list
             bindCode.Add(bindShare.shareInfo.shareUrlCode);
@@ -40,8 +40,14 @@ namespace TraderHelper
             label_WarningText.Text = "[" + bindShare.shareInfo.shareUrlCode + "] " + bindShare.shareData.shareName + " 触发" + (warningType == 0 ? "上" : "下") + "破价格 " + warningPrice + "，现价 " + bindShare.shareData.currentPrice;
             if (warningType == 0)
                 label_WarningText.ForeColor = Color.Red;
-            else
+            else if (warningType == 1)
                 label_WarningText.ForeColor = Color.Green;
+            else if (warningType == 2)
+            {
+                label_WarningText.ForeColor = Color.Red;
+                this.Text = "程序异常";
+                label_WarningText.Text = "数据获取失败";
+            }
         }
 
         private void WarningMessageBox_FormClosing(object sender, FormClosingEventArgs e)
