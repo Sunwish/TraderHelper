@@ -22,5 +22,14 @@ namespace TraderHelper.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1.2.3")]
+        public string version {
+            get {
+                return ((string)(this["version"]));
+            }
+        }
     }
 }

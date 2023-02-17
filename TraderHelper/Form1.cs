@@ -12,6 +12,7 @@ using System.Diagnostics;
 using Sunwish.Notifier;
 using System.Threading;
 using System.Xml.Linq;
+using TraderHelper.Properties;
 
 namespace TraderHelper
 {
@@ -23,7 +24,7 @@ namespace TraderHelper
         int GCTimeFlow; // GC计时变量(s), 计时依赖于timer
         const int GCTime = 3;  // GC时间间隔(s), 计时依赖于timer
         const string DefaultCode = "000001";
-        const string Formtitle = "Trader Helper";
+        readonly string Formtitle = "Trader Helper v" + Properties.Settings.Default.version;
         //const string httpHeader = "http://hq.sinajs.cn/list=";
         const string httpHeader = "http://api.money.126.net/data/feed/";
         const string httpImageHeader = "http://image.sinajs.cn/newchart/min/n/";
@@ -39,9 +40,12 @@ namespace TraderHelper
         const int subitemIndex_CurrentPrice = 3;
         const int subitemIndex_DownPrice = 4;
         static readonly string[] buttonTypeText = { "添加到自选股", "从自选股移除" };
+        private readonly static int RETRY_TIMES = 7;
         System.Media.SoundPlayer warningdPlayer = new System.Media.SoundPlayer("warning.wav");
         System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
-        
+        System.Threading.Timer threadTimer;
+        private int retryTimesLeft = RETRY_TIMES;
+
         public Form1()
         {
             // 固定边框, 禁用标题栏最大化按钮
@@ -128,9 +132,11 @@ namespace TraderHelper
             GCTimeFlow = GCTime;
 
             // Set timer to update stock data automatically
-            timer.Interval = 1000;
+            //threadTimer = new System.Threading.Timer(Timer_Tick, listView_StockList.Items, 0, 1000);
+            timer.Interval = 1111;
             timer.Tick += Timer_Tick;
             timer.Start();
+            
         }
 
         private void ListView1_Click(object sender, EventArgs e)
@@ -310,7 +316,9 @@ namespace TraderHelper
         // 改进方向是，换用 System.Threading.Timer，并将循环需要用到的 listView.StockList 中的数据使用非 UI 对象同步存储一份，
         // 以便在 Threading.Timer 的周期事件中读取，而在需要对 UI 进行更新的时候，通过 Invoke(new Action(() => { /* Update UI */ })) 的方式来实现。
         private async void Timer_Tick(object sender, EventArgs e)
+        //public async void Timer_Tick(object state)
         {
+            
             // Update stock list current price information
             Share share = null;
             foreach (ListViewItem lvi in listView_StockList.Items)
@@ -322,20 +330,24 @@ namespace TraderHelper
                 catch (Exception)
                 {
                     lvi.SubItems[subitemIndex_Name].Text = "数据获取失败";
-                    lvi.SubItems[subitemIndex_CurrentPrice].Text = "数据获取失败";
                     Share exceptionNotifyer = new Share(new ShareInfo("", "", "ForException"), new ShareData(new string[] { }));
                     if (!WarningMessageBox.isShareBind(exceptionNotifyer))
                     {
+                        if(retryTimesLeft > 0)
+                        {
+                            lvi.SubItems[subitemIndex_CurrentPrice].Text = "剩余重试" + retryTimesLeft + "次";
+                            retryTimesLeft--;
+                            break;
+                        }
                         // Create Warning Messagebox
                         WarningMessageBox msg = new WarningMessageBox(exceptionNotifyer, 2, "数据获取失败", this);
                         msg.Show();
+                        retryTimesLeft = RETRY_TIMES;
                     }
-                    
-                    // Play sound
-                    warningdPlayer.Play();
-
+                    lvi.SubItems[subitemIndex_CurrentPrice].Text = "数据获取失败";
                     break;
                 }
+                retryTimesLeft = RETRY_TIMES;
 
                 // if (!IsTradingTime(share.shareData.dataTime)) continue;
                 lvi.SubItems[subitemIndex_Name].Text = share.shareData.shareName;
