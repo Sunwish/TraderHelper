@@ -8,8 +8,6 @@ using System.Threading.Tasks;
 using TraderHelper.api;
 using TraderHelper.common;
 using TraderHelper.staging.datasource.sina;
-using TraderHelper.staging.formatter;
-using TraderHelper.staging.urlbuilder;
 
 namespace TraderHelper.staging.datasource
 {
@@ -21,14 +19,14 @@ namespace TraderHelper.staging.datasource
         internal UrlBuilder dataUrlBuilder;
         internal UrlBuilder imageUrlBuilder;
     }
-    internal class dataSource : DataSource
+    internal class DataSourceImp : DataSource
     {
         Func<string, string> fetchData;
         Func<string, Image> fetchImage;
         Formatter formatter;
         UrlBuilder dataUrlBuilder;
         UrlBuilder imageUrlBuilder;
-        dataSource(DataSourceInfo dataSourceInfo)
+        DataSourceImp(DataSourceInfo dataSourceInfo)
         {
             fetchData = dataSourceInfo.fetchData;
             fetchImage= dataSourceInfo.fetchImage;
@@ -78,7 +76,7 @@ namespace TraderHelper.staging.datasource
             switch (source)
             {
                 case Source.SINA:
-                    dataSourceInfo = sinaDataSource.Info();
+                    dataSourceInfo = SinaDataSource.Info();
                     break;
                 case Source.TENCENT:
                     break;
@@ -87,7 +85,7 @@ namespace TraderHelper.staging.datasource
                 default:
                     break;
             }
-            return new dataSource(dataSourceInfo);
+            return new DataSourceImp(dataSourceInfo);
         }
     }
 }

@@ -10,7 +10,7 @@ using TraderHelper.staging.urlbuilder;
 
 namespace TraderHelper.staging.datasource.sina
 {
-    internal class sinaDataSource
+    internal class SinaDataSource
     {
         public static DataSourceInfo Info()
         {

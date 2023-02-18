@@ -19,9 +19,6 @@ namespace TraderHelper.staging.formatter
             string[] slices = regex.Match(task.originData).Value.Split(',');
             if(slices.Length <= 1)
             {
-                //StackTrace st = new StackTrace(new StackFrame(true));
-                //StackFrame sf = st.GetFrame(0);
-                //throw new Exception(sf.GetMethod().Name + ": 数据解析失败");
                 throw new Exception("数据解析失败");
             }
             SecuritiesData result = null;
@@ -34,10 +31,11 @@ namespace TraderHelper.staging.formatter
                     result = formatFund(task.code, slices);
                     break;
                 default:
-                    break;
+                    throw new Exception("无效的格式化任务类型");
             }
             return result;
         }
+
         SecuritiesData formatStock(string code, string[] slices)
         {
             return new StockData

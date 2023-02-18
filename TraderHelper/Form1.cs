@@ -1,19 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using System.Diagnostics;
 using Sunwish.Notifier;
-using System.Threading;
-using System.Xml.Linq;
-using TraderHelper.Properties;
-using TraderHelper.staging.datasource;
 using TraderHelper.api;
 using TraderHelper.common;
 
@@ -28,9 +20,6 @@ namespace TraderHelper
         const int GCTime = 3;  // GC时间间隔(s), 计时依赖于timer
         const string DefaultCode = "000001";
         readonly string Formtitle = "Trader Helper v" + Properties.Settings.Default.version;
-        //const string httpHeader = "http://hq.sinajs.cn/list=";
-        const string httpHeader = "http://api.money.126.net/data/feed/";
-        const string httpImageHeader = "http://image.sinajs.cn/newchart/min/n/";
         const string stockListFilePath = @"stockList.ini";
         const string wechatNotifyPath = @"serverChan.ini";
         const string pushdeerNotifyPath = @"pushdeer.ini";
@@ -46,7 +35,6 @@ namespace TraderHelper
         private readonly static int RETRY_TIMES = 7;
         System.Media.SoundPlayer warningdPlayer = new System.Media.SoundPlayer("warning.wav");
         System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
-        System.Threading.Timer threadTimer;
         private int retryTimesLeft = RETRY_TIMES;
         DataSource dataSource;
 
@@ -60,14 +48,6 @@ namespace TraderHelper
             textBox_StockCode.KeyPress += textBox1_KeyPress;
             textBox_PriceSettingUp.KeyPress += priceInput_KeyPress;
             textBox_PriceSettingDown.KeyPress += priceInput_KeyPress;
-
-            // Initialize warning player
-            /*
-            if (!File.Exists("warning.wav"))
-                warningdPlayer = new System.Media.SoundPlayer(Properties.Resources.warning);
-            else
-                warningdPlayer = new System.Media.SoundPlayer("warning.wav");
-            */
         }
 
         private void Form1_Resize(object sender, EventArgs e)
@@ -77,7 +57,7 @@ namespace TraderHelper
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            dataSource = staging.datasource.dataSource.New(common.Source.SINA);
+            dataSource = staging.datasource.DataSourceImp.New(common.Source.SINA);
             string code = null;
 
             // Infomation panal initialize
@@ -99,22 +79,6 @@ namespace TraderHelper
             listView_StockList.DoubleClick += ListView1_Click;
             listView_StockList.HideSelection = false;
             UpdatePriceSetting();
-
-            // Load wechat notify settings
-            /*
-            if (File.Exists(wechatNotifyPath))
-            {
-                using (StreamReader streamReader = new StreamReader(wechatNotifyPath))
-                {
-                    string SCKEY = streamReader.ReadLine();
-                    if (null != SCKEY && !SCKEY.Equals(""))
-                    {
-                        Notify_SCKEY = SCKEY;
-                        wechatNotify.Checked = true;
-                    }
-                }
-            }
-            */
 
             // Load pushdeer notify settings
             if (File.Exists(pushdeerNotifyPath))
@@ -146,7 +110,6 @@ namespace TraderHelper
 
         private void ListView1_Click(object sender, EventArgs e)
         {
-            //throw new NotImplementedException();
             ListView lv = sender as ListView;
             string code =lv.SelectedItems[0].Text;
             textBox_StockCode.Text = code;
@@ -214,7 +177,7 @@ namespace TraderHelper
                 if (IsTradingTime(data.time) || getFully)
                 {
                     // Get Share real-time image
-                    pictureBox_StockImage.Image = GetShareImgByCode(code);
+                    pictureBox_StockImage.Image = dataSource.GetImage(code); ;
                     // System.Diagnostics.Debug.WriteLine("Picture!");
                 }
                 UpdateButtonType();
@@ -237,57 +200,11 @@ namespace TraderHelper
         {
             // Trading-time judgement
             /// Get Hour-Minute
-            System.Text.RegularExpressions.Match timePartMatch = Helper.Regexer_Ex(@"\d{2}", shareDataTime);
+            System.Text.RegularExpressions.Match timePartMatch = helper.Regexer_Ex(@"\d{2}", shareDataTime);
             /// Convert to minutes
             int currentTime = int.Parse(timePartMatch.ToString()) * 60 + int.Parse(timePartMatch.NextMatch().ToString());
             /// Reload Picture only in trading time (or in necessary cases)
             return ((currentTime >= 9 * 60 && currentTime < 11 * 60 + 30) || (currentTime >= 13 * 60 && currentTime < 15 * 60));
-        }
-
-        private string GetShareTypeByCode(string shareCode, string apiType = "163")
-        {
-            string sz = "sz";
-            string sh = "sh";
-            if (apiType == "sina")
-            {
-                // sina api type
-                sz = "sz";
-                sh = "sh";
-            }
-            else if (apiType == "163")
-            {
-                // 163 api type
-                sz = "1";
-                sh = "0";
-            }
-
-            if (shareCode == DefaultCode)
-                return sh;
-            return ((shareCode.First() == '0') || shareCode.First() == '3') ? sz : sh;
-        }
-
-        private async Task<Share> GetShareByCode(string shareCode)
-        {
-            // Get Share Data
-            string shareType = GetShareTypeByCode(shareCode);
-            Share share = null;
-            try
-            {
-                share = await Share.CreateFromShareInfo(ShareInfo.Build(httpHeader, shareType, shareCode));
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            return share;
-        }
-
-        private Image GetShareImgByCode(string shareCode)
-        {
-            // Get Share real-time image 
-            //string shareType = GetShareTypeByCode(shareCode, "sina");
-            //return Helper.HttpRequestImage(httpImageHeader + shareType + shareCode + ".gif");
-            return dataSource.GetImage(shareCode);
         }
 
         private void textBox1_KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
@@ -353,7 +270,6 @@ namespace TraderHelper
                 }
                 retryTimesLeft = RETRY_TIMES;
 
-                // if (!IsTradingTime(share.shareData.dataTime)) continue;
                 lvi.SubItems[subitemIndex_Name].Text = data.name;
                 lvi.SubItems[subitemIndex_CurrentPrice].Text = data.price;
                 if(lvi.SubItems[subitemIndex_CurrentPrice].Text != "")
@@ -412,7 +328,7 @@ namespace TraderHelper
                                     warrow = "↓";
                                     wprice = lvi.SubItems[subitemIndex_DownPrice].Text;
                                 }
-                                Helper.HttpResponseStream(pushdeerBaseUrl + @"pushkey=" + Notify_PUSHKEY + "&text=[" + data.code + "] " + data.name + " " + wdirection + " " + wprice +  " " + warrow);
+                                http.HttpResponseStream(pushdeerBaseUrl + @"pushkey=" + Notify_PUSHKEY + "&text=[" + data.code + "] " + data.name + " " + wdirection + " " + wprice + " " + warrow, (req) => { });
                             }
 
                             // Create Warning Messagebox
@@ -470,7 +386,7 @@ namespace TraderHelper
         {
             string code = textBox_StockCode.Text;
 
-            if (Helper.isStockCodeExistList(code, stockListFilePath))   buttonType = 1;
+            if (helper.isStockCodeExistList(code, stockListFilePath))   buttonType = 1;
             else buttonType = 0;
 
             button_StockListItemOperate.Text = buttonTypeText[buttonType];
@@ -511,9 +427,9 @@ namespace TraderHelper
             string tarCode = textBox_StockCode.Text;
             if(buttonType == 0) // Add to list
             {
-                if (Helper.isStockCodeExistList(tarCode, stockListFilePath)) return;
+                if (helper.isStockCodeExistList(tarCode, stockListFilePath)) return;
 
-                using (System.IO.StreamWriter streamWriter = new System.IO.StreamWriter(stockListFilePath, true))
+                using (StreamWriter streamWriter = new StreamWriter(stockListFilePath, true))
                 {
                     streamWriter.WriteLine(textBox_StockCode.Text);
                 }
@@ -534,8 +450,6 @@ namespace TraderHelper
 
         private void UpdatePriceSetting(bool write = false)
         {
-            // throw new NotImplementedException();
-
             if(write)
             {
                 string output = "";
@@ -564,9 +478,9 @@ namespace TraderHelper
                 {
                     string[] config = stremReader.ReadToEnd().Split('\n');
                     if (config.Length < 2) return;
-                    System.Text.RegularExpressions.Match result = Helper.Regexer_Ex("(?<={).+(?=})", config[0]);
+                    System.Text.RegularExpressions.Match result = helper.Regexer_Ex("(?<={).+(?=})", config[0]);
                     string upPrice = result.Value.ToString();
-                    result = Helper.Regexer_Ex("(?<={).+(?=})", config[1]);
+                    result = helper.Regexer_Ex("(?<={).+(?=})", config[1]);
                     string downPrice = result.ToString();
                     lvi.SubItems[subitemIndex_UpPrice].Text = upPrice;
                     lvi.SubItems[subitemIndex_DownPrice].Text = downPrice;
@@ -590,7 +504,6 @@ namespace TraderHelper
             listView_StockList.Items[index].SubItems[subitemIndex_UpPrice].Text = upPrice;
             listView_StockList.Items[index].SubItems[subitemIndex_DownPrice].Text = downPrice;
 
-            // save to file (Implement later)
             UpdatePriceSetting(true);
         }
 

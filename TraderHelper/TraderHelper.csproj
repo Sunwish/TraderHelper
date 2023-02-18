@@ -66,8 +66,8 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="staging\datasource\dataSource.cs" />
-    <Compile Include="staging\datasource\sina\sinaDataSource.cs" />
+    <Compile Include="staging\datasource\DataSourceImp.cs" />
+    <Compile Include="staging\datasource\sina\SinaDataSource.cs" />
     <Compile Include="staging\formatter\SinaDataFormatter.cs" />
     <Compile Include="staging\urlbuilder\SinaUrlBuilder.cs" />
     <Compile Include="WarningMessageBox.cs">
@@ -76,10 +76,9 @@
     <Compile Include="WarningMessageBox.Designer.cs">
       <DependentUpon>WarningMessageBox.cs</DependentUpon>
     </Compile>
-    <Compile Include="Helper.cs" />
+    <Compile Include="common\helper.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Share.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -114,6 +113,7 @@
     <Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="bin\Debug\warning.wav" />
     <Content Include="DEFAULT_ICON.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

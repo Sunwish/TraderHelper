@@ -13,7 +13,7 @@ namespace TraderHelper.staging.urlbuilder
     {
         private string urlBase;
         private string ext;
-        public SinaUrlBuilder(string urlBase = "http://hq.sinajs.cn/list=", string ext = "")
+        public SinaUrlBuilder(string urlBase, string ext = "")
         {
             this.urlBase = urlBase;
             this.ext = ext;
