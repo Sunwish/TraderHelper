@@ -55,12 +55,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="api\DataSource.cs" />
+    <Compile Include="api\Formatter.cs" />
+    <Compile Include="api\UrlBuilder.cs" />
+    <Compile Include="common\common.cs" />
+    <Compile Include="common\http.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="staging\datasource\dataSource.cs" />
+    <Compile Include="staging\datasource\sina\sinaDataSource.cs" />
+    <Compile Include="staging\formatter\SinaDataFormatter.cs" />
+    <Compile Include="staging\urlbuilder\SinaUrlBuilder.cs" />
     <Compile Include="WarningMessageBox.cs">
       <SubType>Form</SubType>
     </Compile>
