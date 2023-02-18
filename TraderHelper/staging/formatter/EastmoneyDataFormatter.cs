@@ -23,8 +23,6 @@ namespace TraderHelper.staging.formatter
             switch (task.targetType)
             {
                 case DataType.STOCK:
-                    result = format(task.code, task.originData);
-                    break;
                 case DataType.FUND:
                     result = format(task.code, task.originData);
                     break;
@@ -50,6 +48,12 @@ namespace TraderHelper.staging.formatter
                 (dateTime.Hour < 10 ? "0" : "") + dateTime.Hour.ToString() + ":" +
                 (dateTime.Minute < 10 ? "0" : "") + dateTime.Minute.ToString() + ":" +
                 (dateTime.Second < 10 ? "0" : "") + dateTime.Second.ToString();
+
+            string date =
+                dateTime.Year.ToString() + "/" +
+                (dateTime.Month < 10 ? "0" : "") + dateTime.Month.ToString() + "/" +
+                (dateTime.Day < 10 ? "0" : "") + dateTime.Day.ToString();
+
             return new StockData
             {
                 dataType = DataType.STOCK,
@@ -57,6 +61,7 @@ namespace TraderHelper.staging.formatter
                 name = name,
                 price = price,
                 time = time,
+                date = date,
             };
         }
     }

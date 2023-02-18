@@ -24,10 +24,8 @@ namespace TraderHelper.staging.formatter
             switch (task.targetType)
             {
                 case DataType.STOCK:
-                    result = formatStock(task.code, slices);
-                    break;
                 case DataType.FUND:
-                    result = formatFund(task.code, slices);
+                    result = format(task.code, slices);
                     break;
                 default:
                     throw new Exception("无效的格式化任务类型");
@@ -35,7 +33,7 @@ namespace TraderHelper.staging.formatter
             return result;
         }
 
-        SecuritiesData formatStock(string code, string[] slices)
+        SecuritiesData format(string code, string[] slices)
         {
             return new StockData
             {
@@ -44,18 +42,7 @@ namespace TraderHelper.staging.formatter
                 name = slices[1],
                 price = slices[3],
                 time = slices[30].Substring(8, 2) + ":" + slices[30].Substring(10, 2) + ":" + slices[30].Substring(12, 2),
-            };
-        }
-
-        SecuritiesData formatFund(string code, string[] slices)
-        {
-            return new StockData
-            {
-                dataType = DataType.FUND,
-                code = code,
-                name = slices[1],
-                price = slices[3],
-                time = slices[30].Substring(8, 2) + ":" + slices[30].Substring(10, 2) + ":" + slices[30].Substring(12, 2),
+                date = slices[30].Substring(0, 4) + "/" + slices[30].Substring(4, 2) + "/" + slices[30].Substring(6, 2),
             };
         }
     }

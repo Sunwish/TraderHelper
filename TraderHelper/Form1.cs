@@ -153,7 +153,7 @@ namespace TraderHelper
                 if (data == null) throw new Exception("Get share data failed!");
 
                 // Update Information Panal Text
-                string outputString = "股票名称: " + data.name + "\n现价:" + data.price + "\n数据时间: " + data.time; //+ "\n买一: " + share.shareData.buyPrice[0] + "\n卖一:" + share.shareData.sellPrice[0] + "\n数据时间: " + share.shareData.dataTime;
+                string outputString = "股票名称: " + data.name + "\n现价:" + data.price + "\n数据时间: " + data.date + " " + data.time; //+ "\n买一: " + share.shareData.buyPrice[0] + "\n卖一:" + share.shareData.sellPrice[0] + "\n数据时间: " + share.shareData.dataTime;
                 textBox_StockInformation.Text = outputString.Replace("\n", Environment.NewLine + Environment.NewLine);
                 
                 // Update Up/Down Price panal current price / down price / up price               

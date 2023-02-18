@@ -45,6 +45,7 @@ namespace TraderHelper.staging.formatter
                 name = slices[0].Substring(1),
                 price = slices[3],
                 time = slices[slices.Length - 3],
+                date = slices[slices.Length - 4].Replace('-', '/'),
             };
         }
 
@@ -57,6 +58,7 @@ namespace TraderHelper.staging.formatter
                 name = slices[0].Substring(1),
                 price = slices[3],
                 time = slices[slices.Length - 2],
+                date = slices[slices.Length - 3].Replace('-', '/'),
             };
         }
     }

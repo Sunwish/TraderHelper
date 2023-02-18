@@ -20,6 +20,7 @@ namespace TraderHelper.common
         public string code;
         public string name;
         public string price;
+        public string date;
         public string time;
     }
     class StockData : SecuritiesData { }
