@@ -57,7 +57,7 @@ namespace TraderHelper
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            dataSource = staging.datasource.DataSourceImp.New(common.Source.SINA);
+            dataSource = staging.datasource.DataSourceImp.New(common.Source.TENCENT);
             string code = null;
 
             // Infomation panal initialize

@@ -68,7 +68,10 @@
     </Compile>
     <Compile Include="staging\datasource\DataSourceImp.cs" />
     <Compile Include="staging\datasource\sina\SinaDataSource.cs" />
+    <Compile Include="staging\datasource\sina\TencentDataSource.cs" />
     <Compile Include="staging\formatter\SinaDataFormatter.cs" />
+    <Compile Include="staging\formatter\TencentDataFormatter.cs" />
+    <Compile Include="staging\urlbuilder\TencentUrlBuilder.cs" />
     <Compile Include="staging\urlbuilder\SinaUrlBuilder.cs" />
     <Compile Include="WarningMessageBox.cs">
       <SubType>Form</SubType>

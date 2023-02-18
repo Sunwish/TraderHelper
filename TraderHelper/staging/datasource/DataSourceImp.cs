@@ -79,11 +79,12 @@ namespace TraderHelper.staging.datasource
                     dataSourceInfo = SinaDataSource.Info();
                     break;
                 case Source.TENCENT:
+                    dataSourceInfo = TencentDataSource.Info();
                     break;
                 case Source.NETEASE:
                     break;
                 default:
-                    break;
+                    throw new Exception("未知的数据源");
             }
             return new DataSourceImp(dataSourceInfo);
         }
