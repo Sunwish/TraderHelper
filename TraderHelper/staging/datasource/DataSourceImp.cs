@@ -81,7 +81,8 @@ namespace TraderHelper.staging.datasource
                 case Source.TENCENT:
                     dataSourceInfo = TencentDataSource.Info();
                     break;
-                case Source.NETEASE:
+                case Source.EASTMONEY:
+                    dataSourceInfo = EastmoneyDataSource.Info();
                     break;
                 default:
                     throw new Exception("未知的数据源");

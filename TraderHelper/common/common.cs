@@ -40,7 +40,7 @@ namespace TraderHelper.common
     {
         SINA,
         TENCENT,
-        NETEASE
+        EASTMONEY
     }
 
     class Common
