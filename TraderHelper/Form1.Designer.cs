@@ -53,6 +53,8 @@
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.wechatNotify = new System.Windows.Forms.CheckBox();
             this.pushdeerNotify = new System.Windows.Forms.CheckBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.dataSourceComboBox = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_StockImage)).BeginInit();
             this.UpDownPriceConfigPanal.SuspendLayout();
             this.SuspendLayout();
@@ -71,12 +73,12 @@
             // 
             this.textBox_StockInformation.BackColor = System.Drawing.Color.White;
             this.textBox_StockInformation.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.textBox_StockInformation.Location = new System.Drawing.Point(860, 112);
+            this.textBox_StockInformation.Location = new System.Drawing.Point(860, 174);
             this.textBox_StockInformation.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.textBox_StockInformation.Multiline = true;
             this.textBox_StockInformation.Name = "textBox_StockInformation";
             this.textBox_StockInformation.ReadOnly = true;
-            this.textBox_StockInformation.Size = new System.Drawing.Size(398, 237);
+            this.textBox_StockInformation.Size = new System.Drawing.Size(398, 175);
             this.textBox_StockInformation.TabIndex = 2;
             // 
             // label1
@@ -295,12 +297,38 @@
             this.pushdeerNotify.UseVisualStyleBackColor = true;
             this.pushdeerNotify.CheckedChanged += new System.EventHandler(this.pushdeerNotify_CheckedChanged);
             // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label5.Location = new System.Drawing.Point(854, 106);
+            this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(110, 31);
+            this.label5.TabIndex = 19;
+            this.label5.Text = "数据来源";
+            // 
+            // dataSourceComboBox
+            // 
+            this.dataSourceComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.dataSourceComboBox.FormattingEnabled = true;
+            this.dataSourceComboBox.Items.AddRange(new object[] {
+            "腾讯财经",
+            "新浪财经",
+            "东方财经"});
+            this.dataSourceComboBox.Location = new System.Drawing.Point(966, 106);
+            this.dataSourceComboBox.Name = "dataSourceComboBox";
+            this.dataSourceComboBox.Size = new System.Drawing.Size(188, 32);
+            this.dataSourceComboBox.TabIndex = 20;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(1240, 832);
+            this.Controls.Add(this.dataSourceComboBox);
+            this.Controls.Add(this.label5);
             this.Controls.Add(this.pushdeerNotify);
             this.Controls.Add(this.wechatNotify);
             this.Controls.Add(this.DivideLine);
@@ -349,6 +377,8 @@
         private System.Windows.Forms.NotifyIcon notifyIcon1;
         private System.Windows.Forms.CheckBox wechatNotify;
         private System.Windows.Forms.CheckBox pushdeerNotify;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.ComboBox dataSourceComboBox;
     }
 }
 

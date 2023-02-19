@@ -39,8 +39,8 @@ namespace TraderHelper.common
     }
     enum Source
     {
-        SINA,
         TENCENT,
+        SINA,
         EASTMONEY
     }
 

@@ -8,6 +8,8 @@ using System.Diagnostics;
 using Sunwish.Notifier;
 using TraderHelper.api;
 using TraderHelper.common;
+using System.Text;
+using TraderHelper.staging.datasource;
 
 namespace TraderHelper
 {
@@ -23,6 +25,7 @@ namespace TraderHelper
         const string stockListFilePath = @"stockList.ini";
         const string wechatNotifyPath = @"serverChan.ini";
         const string pushdeerNotifyPath = @"pushdeer.ini";
+        const string dataSourceSelectionPath = @"dataSource.ini";
         const string pushdeerBaseUrl = @"http://notify.houkaifa.com/message/push?";
         const string stockUpDownPriceDirectoryPath = @"stocksConfig";
         int currentIndex = -1;
@@ -36,6 +39,7 @@ namespace TraderHelper
         System.Media.SoundPlayer warningdPlayer = new System.Media.SoundPlayer("warning.wav");
         System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
         private int retryTimesLeft = RETRY_TIMES;
+        readonly string defaultDataSourceSelection = Enum.GetNames(typeof(Source)).First<string>();
         DataSource dataSource;
 
         public Form1()
@@ -48,6 +52,7 @@ namespace TraderHelper
             textBox_StockCode.KeyPress += textBox1_KeyPress;
             textBox_PriceSettingUp.KeyPress += priceInput_KeyPress;
             textBox_PriceSettingDown.KeyPress += priceInput_KeyPress;
+            MakeComboBoxTextCenter();
         }
 
         private void Form1_Resize(object sender, EventArgs e)
@@ -57,11 +62,26 @@ namespace TraderHelper
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            dataSource = staging.datasource.DataSourceImp.New(common.Source.TENCENT);
-            string code = null;
+            // Load data source selection
+            string source = defaultDataSourceSelection;
+            if (File.Exists(dataSourceSelectionPath))
+            {
+                using (StreamReader streamReader = new StreamReader(dataSourceSelectionPath))
+                {
+                    string selection = streamReader.ReadLine();
+                    source = selection;
+                }
+            } else
+            {
+                using (StreamWriter streamWriter = new StreamWriter(dataSourceSelectionPath))
+                    streamWriter.Write(defaultDataSourceSelection);
+            }
+            dataSourceComboBox.SelectedIndex = (int)UseDataSource(source);
+            dataSourceComboBox.SelectedIndexChanged += dataSourceComboBox_SelectedIndexChanged;
 
             // Infomation panal initialize
             // Get Stock List and display the first stock
+            string code = null;
             string firstStock = Get2DisplayStockList();
             if (firstStock != null)
             {
@@ -108,6 +128,41 @@ namespace TraderHelper
             
         }
 
+        private Source UseDataSource(string dataSourceEnumName)
+        {
+            if (null == dataSourceEnumName || dataSourceEnumName.Equals("") || !Enum.IsDefined(typeof(Source), dataSourceEnumName))
+            {
+                dataSourceEnumName = defaultDataSourceSelection;
+            }
+            foreach (Source source in Enum.GetValues(typeof(Source)))
+            {
+                if(source.ToString() == dataSourceEnumName)
+                {
+                    dataSource = DataSourceImp.New(source);
+                    Console.WriteLine("Use data source [" + source.ToString() + "]");
+                    return source;
+                }
+            }
+            return 0;
+        }
+        private void MakeComboBoxTextCenter()
+        {
+            float w1 = dataSourceComboBox.Width;
+            Graphics graphics = CreateGraphics();
+            SizeF sizeF_sp = graphics.MeasureString(" ", dataSourceComboBox.Font); //空格宽度
+            for (int i = 0; i < dataSourceComboBox.Items.Count; i++)
+            {
+                SizeF sizeF_1 = graphics.MeasureString(dataSourceComboBox.Items[i].ToString(), dataSourceComboBox.Font); // 选中字宽度
+                int spmun = (int)(((w1 - sizeF_1.Width) / 2) / sizeF_sp.Width);
+                StringBuilder sb = new StringBuilder();
+                for (int j = 0; j < spmun - 2; j++)
+                {
+                    sb.Append(" ");
+                }
+                sb.Append(dataSourceComboBox.Items[i].ToString());
+                dataSourceComboBox.Items[i] = sb.ToString();
+            }
+        }
         private void ListView1_Click(object sender, EventArgs e)
         {
             ListView lv = sender as ListView;
@@ -615,6 +670,31 @@ namespace TraderHelper
                 MessageBox.Show("要开启 PushDeer 提醒，请先在配置文件 [pushdeer.ini] 中写入 KEY。\n请在弹出的" + (pngExist ? "图片" : "网页") + "中使用 iOS14+ 自带相机扫码，在弹出的轻应用中输入 URL 为：http://notify.houkaifa.com，\n然后登录绑定，得到用于通知的 Key。\n轻应用若30天未使用需要重新更新授权，故若长期使用请扫码后在弹出的卡片底部进入 App Store 下载使用。\n安卓版请前往：https://github.com/easychen/pushdeer/releases 下载。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
             }
 
+        }
+
+        private void dataSourceComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string selectionName = defaultDataSourceSelection;
+            switch(dataSourceComboBox.SelectedIndex)
+            {
+                case 0:
+                    selectionName = UseDataSource(common.Source.TENCENT.ToString()).ToString();
+                    //dataSource = staging.datasource.DataSourceImp.New(common.Source.TENCENT);
+                    break;
+                case 1:
+                    selectionName = UseDataSource(common.Source.SINA.ToString()).ToString();
+                    break;
+                case 2:
+                    selectionName = UseDataSource(common.Source.EASTMONEY.ToString()).ToString();
+                    break;
+                default:
+                    selectionName = UseDataSource(null).ToString();
+                    break;
+            }
+            using(StreamWriter writer = new StreamWriter(dataSourceSelectionPath))
+            {
+                writer.WriteLine(selectionName);
+            }
         }
     }
 }
