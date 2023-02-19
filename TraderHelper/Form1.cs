@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using System.Diagnostics;
 using Sunwish.Notifier;
-using System.Threading;
-using System.Xml.Linq;
-using TraderHelper.Properties;
+using TraderHelper.api;
+using TraderHelper.common;
+using System.Text;
+using TraderHelper.staging.datasource;
 
 namespace TraderHelper
 {
@@ -25,12 +22,10 @@ namespace TraderHelper
         const int GCTime = 3;  // GC时间间隔(s), 计时依赖于timer
         const string DefaultCode = "000001";
         readonly string Formtitle = "Trader Helper v" + Properties.Settings.Default.version;
-        //const string httpHeader = "http://hq.sinajs.cn/list=";
-        const string httpHeader = "http://api.money.126.net/data/feed/";
-        const string httpImageHeader = "http://image.sinajs.cn/newchart/min/n/";
         const string stockListFilePath = @"stockList.ini";
         const string wechatNotifyPath = @"serverChan.ini";
         const string pushdeerNotifyPath = @"pushdeer.ini";
+        const string dataSourceSelectionPath = @"dataSource.ini";
         const string pushdeerBaseUrl = @"http://notify.houkaifa.com/message/push?";
         const string stockUpDownPriceDirectoryPath = @"stocksConfig";
         int currentIndex = -1;
@@ -43,8 +38,9 @@ namespace TraderHelper
         private readonly static int RETRY_TIMES = 7;
         System.Media.SoundPlayer warningdPlayer = new System.Media.SoundPlayer("warning.wav");
         System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
-        System.Threading.Timer threadTimer;
         private int retryTimesLeft = RETRY_TIMES;
+        readonly string defaultDataSourceSelection = Enum.GetNames(typeof(Source)).First<string>();
+        DataSource dataSource;
 
         public Form1()
         {
@@ -56,14 +52,7 @@ namespace TraderHelper
             textBox_StockCode.KeyPress += textBox1_KeyPress;
             textBox_PriceSettingUp.KeyPress += priceInput_KeyPress;
             textBox_PriceSettingDown.KeyPress += priceInput_KeyPress;
-
-            // Initialize warning player
-            /*
-            if (!File.Exists("warning.wav"))
-                warningdPlayer = new System.Media.SoundPlayer(Properties.Resources.warning);
-            else
-                warningdPlayer = new System.Media.SoundPlayer("warning.wav");
-            */
+            MakeComboBoxTextCenter();
         }
 
         private void Form1_Resize(object sender, EventArgs e)
@@ -71,13 +60,29 @@ namespace TraderHelper
             this.ShowInTaskbar = !(this.WindowState == FormWindowState.Minimized);
         }
 
-        private async void Form1_Load(object sender, EventArgs e)
+        private void Form1_Load(object sender, EventArgs e)
         {
-            string code = null;
+            // Load data source selection
+            string source = defaultDataSourceSelection;
+            if (File.Exists(dataSourceSelectionPath))
+            {
+                using (StreamReader streamReader = new StreamReader(dataSourceSelectionPath))
+                {
+                    string selection = streamReader.ReadLine();
+                    source = selection;
+                }
+            } else
+            {
+                using (StreamWriter streamWriter = new StreamWriter(dataSourceSelectionPath))
+                    streamWriter.Write(defaultDataSourceSelection);
+            }
+            dataSourceComboBox.SelectedIndex = (int)UseDataSource(source);
+            dataSourceComboBox.SelectedIndexChanged += dataSourceComboBox_SelectedIndexChanged;
 
             // Infomation panal initialize
             // Get Stock List and display the first stock
-            string firstStock = await Get2DisplayStockList();
+            string code = null;
+            string firstStock = Get2DisplayStockList();
             if (firstStock != null)
             {
                 code = firstStock;
@@ -95,22 +100,6 @@ namespace TraderHelper
             listView_StockList.HideSelection = false;
             UpdatePriceSetting();
 
-            // Load wechat notify settings
-            /*
-            if (File.Exists(wechatNotifyPath))
-            {
-                using (StreamReader streamReader = new StreamReader(wechatNotifyPath))
-                {
-                    string SCKEY = streamReader.ReadLine();
-                    if (null != SCKEY && !SCKEY.Equals(""))
-                    {
-                        Notify_SCKEY = SCKEY;
-                        wechatNotify.Checked = true;
-                    }
-                }
-            }
-            */
-
             // Load pushdeer notify settings
             if (File.Exists(pushdeerNotifyPath))
             {
@@ -126,7 +115,7 @@ namespace TraderHelper
             }
 
             // Display Data
-            await Get2DisplayShareInfomationByCode(code, true);
+            Get2DisplayShareInfomationByCode(code, true);
 
             // GC Time initialize
             GCTimeFlow = GCTime;
@@ -139,15 +128,49 @@ namespace TraderHelper
             
         }
 
+        private Source UseDataSource(string dataSourceEnumName)
+        {
+            if (null == dataSourceEnumName || dataSourceEnumName.Equals("") || !Enum.IsDefined(typeof(Source), dataSourceEnumName))
+            {
+                dataSourceEnumName = defaultDataSourceSelection;
+            }
+            foreach (Source source in Enum.GetValues(typeof(Source)))
+            {
+                if(source.ToString() == dataSourceEnumName)
+                {
+                    dataSource = DataSourceImp.New(source);
+                    Console.WriteLine("Use data source [" + source.ToString() + "]");
+                    return source;
+                }
+            }
+            return 0;
+        }
+        private void MakeComboBoxTextCenter()
+        {
+            float w1 = dataSourceComboBox.Width;
+            Graphics graphics = CreateGraphics();
+            SizeF sizeF_sp = graphics.MeasureString(" ", dataSourceComboBox.Font); //空格宽度
+            for (int i = 0; i < dataSourceComboBox.Items.Count; i++)
+            {
+                SizeF sizeF_1 = graphics.MeasureString(dataSourceComboBox.Items[i].ToString(), dataSourceComboBox.Font); // 选中字宽度
+                int spmun = (int)(((w1 - sizeF_1.Width) / 2) / sizeF_sp.Width);
+                StringBuilder sb = new StringBuilder();
+                for (int j = 0; j < spmun - 2; j++)
+                {
+                    sb.Append(" ");
+                }
+                sb.Append(dataSourceComboBox.Items[i].ToString());
+                dataSourceComboBox.Items[i] = sb.ToString();
+            }
+        }
         private void ListView1_Click(object sender, EventArgs e)
         {
-            //throw new NotImplementedException();
             ListView lv = sender as ListView;
             string code =lv.SelectedItems[0].Text;
             textBox_StockCode.Text = code;
         }
 
-        private async Task<string> Get2DisplayStockList() // return first stock code
+        private string Get2DisplayStockList() // return first stock code
         {
             if (!File.Exists(stockListFilePath))
                 using (StreamWriter streamWriter = new StreamWriter(stockListFilePath))
@@ -156,45 +179,44 @@ namespace TraderHelper
             {
                 string line = streamReader.ReadLine();
                 string first = line;
-                Share share = null;
+                SecuritiesData data;
                 while (line != null)
                 {
                     try
                     {
-                        share = await GetShareByCode(line);
+                        data = dataSource.GetData(line);
                     }
                     catch (Exception)
                     {
-                        share = new Share(new ShareInfo("", "", line), new ShareData(new string[] { }));
-                        share.shareData.currentPrice = "数据获取失败";
+                        data = new StockData { code = line };
+                        data.price = "数据获取失败";
                     }
-                    Add2StockList(share.shareInfo.shareUrlCode, share.shareData.shareName, "", share.shareData.currentPrice, "");
+                    Add2StockList(data.code, data.name, "", data.price, "");
                     line = streamReader.ReadLine();
                 }
                 return first;
             }
         }
 
-        private async Task<bool> Get2DisplayShareInfomationByCode(string code, bool getFully = false)
+        private bool Get2DisplayShareInfomationByCode(string code, bool getFully = false)
         {
             textBox_StockInformation.Text = "";
-
             try
             {
                 // Get Share Data
-                Share share = await GetShareByCode(code);
-                if (share.shareData == null) throw new Exception("Get share data failed!");
-                 
-                // Update Information Panal Text
-                string outputString = "股票名称: " + share.shareData.shareName + "\n现价:" + share.shareData.currentPrice + "\n买一: " + share.shareData.buyPrice[0] + "\n卖一:" + share.shareData.sellPrice[0] + "\n数据时间: " + share.shareData.dataTime;
-                textBox_StockInformation.Text = outputString.Replace("\n", Environment.NewLine + Environment.NewLine);
+                SecuritiesData data = dataSource.GetData(code);
+                if (data == null) throw new Exception("Get share data failed!");
 
+                // Update Information Panal Text
+                string outputString = "股票名称: " + data.name + "\n现价:" + data.price + "\n数据时间: " + data.date + " " + data.time; //+ "\n买一: " + share.shareData.buyPrice[0] + "\n卖一:" + share.shareData.sellPrice[0] + "\n数据时间: " + share.shareData.dataTime;
+                textBox_StockInformation.Text = outputString.Replace("\n", Environment.NewLine + Environment.NewLine);
+                
                 // Update Up/Down Price panal current price / down price / up price               
                 ListViewItem lvi = listView_StockList.FindItemWithText(code);
                 if (lvi != null)
                 {
                     UpDownPriceConfigPanal.Enabled = true;
-                    textBox_PriceSettingCurrent.Text = share.shareData.currentPrice;
+                    textBox_PriceSettingCurrent.Text = data.price;
                     if (getFully)
                     {
                         textBox_PriceSettingUp.Text = lvi.SubItems[subitemIndex_UpPrice].Text;
@@ -207,13 +229,12 @@ namespace TraderHelper
 
                 // Trading-time judgement
                 /// Reload Picture only in trading time (or in necessary cases)
-                if (IsTradingTime(share.shareData.dataTime) || getFully)
+                if (IsTradingTime(data.time) || getFully)
                 {
                     // Get Share real-time image
-                    pictureBox_StockImage.Image = GetShareImgByCode(code);
+                    pictureBox_StockImage.Image = dataSource.GetImage(code); ;
                     // System.Diagnostics.Debug.WriteLine("Picture!");
                 }
-
                 UpdateButtonType();
                 UpDownPriceConfigPanal.Enabled = true;
                 button_StockListItemOperate.Enabled = true;
@@ -234,56 +255,11 @@ namespace TraderHelper
         {
             // Trading-time judgement
             /// Get Hour-Minute
-            System.Text.RegularExpressions.Match timePartMatch = Helper.Regexer_Ex(@"\d{2}", shareDataTime);
+            System.Text.RegularExpressions.Match timePartMatch = helper.Regexer_Ex(@"\d{2}", shareDataTime);
             /// Convert to minutes
             int currentTime = int.Parse(timePartMatch.ToString()) * 60 + int.Parse(timePartMatch.NextMatch().ToString());
             /// Reload Picture only in trading time (or in necessary cases)
             return ((currentTime >= 9 * 60 && currentTime < 11 * 60 + 30) || (currentTime >= 13 * 60 && currentTime < 15 * 60));
-        }
-
-        private string GetShareTypeByCode(string shareCode, string apiType = "163")
-        {
-            string sz = "sz";
-            string sh = "sh";
-            if (apiType == "sina")
-            {
-                // sina api type
-                sz = "sz";
-                sh = "sh";
-            }
-            else if (apiType == "163")
-            {
-                // 163 api type
-                sz = "1";
-                sh = "0";
-            }
-
-            if (shareCode == DefaultCode)
-                return sh;
-            return ((shareCode.First() == '0') || shareCode.First() == '3') ? sz : sh;
-        }
-
-        private async Task<Share> GetShareByCode(string shareCode)
-        {
-            // Get Share Data
-            string shareType = GetShareTypeByCode(shareCode);
-            Share share = null;
-            try
-            {
-                share = await Share.CreateFromShareInfo(ShareInfo.Build(httpHeader, shareType, shareCode));
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            return share;
-        }
-
-        private Image GetShareImgByCode(string shareCode)
-        {
-            // Get Share real-time image 
-            string shareType = GetShareTypeByCode(shareCode, "sina");
-            return Helper.HttpRequestImage(httpImageHeader + shareType + shareCode + ".gif");
         }
 
         private void textBox1_KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
@@ -315,23 +291,23 @@ namespace TraderHelper
         // 因此改写为 async 并不能避免 GetShareByCode 与 Get2DisplayShareInfomationByCode 造成的界面卡顿，
         // 改进方向是，换用 System.Threading.Timer，并将循环需要用到的 listView.StockList 中的数据使用非 UI 对象同步存储一份，
         // 以便在 Threading.Timer 的周期事件中读取，而在需要对 UI 进行更新的时候，通过 Invoke(new Action(() => { /* Update UI */ })) 的方式来实现。
-        private async void Timer_Tick(object sender, EventArgs e)
+        private void Timer_Tick(object sender, EventArgs e)
         //public async void Timer_Tick(object state)
         {
             
             // Update stock list current price information
-            Share share = null;
+            SecuritiesData data;
             foreach (ListViewItem lvi in listView_StockList.Items)
             {
                 try
                 {
-                    share = await GetShareByCode(lvi.Text);
+                    data = dataSource.GetData(lvi.Text);
                 }
                 catch (Exception)
                 {
                     lvi.SubItems[subitemIndex_Name].Text = "数据获取失败";
-                    Share exceptionNotifyer = new Share(new ShareInfo("", "", "ForException"), new ShareData(new string[] { }));
-                    if (!WarningMessageBox.isShareBind(exceptionNotifyer))
+                    SecuritiesData exceptionNotifyer = new SecuritiesData { code = "ForException" };
+                    if (!WarningMessageBox.isSecuritiesObjectBind(exceptionNotifyer))
                     {
                         if(retryTimesLeft > 0)
                         {
@@ -349,9 +325,8 @@ namespace TraderHelper
                 }
                 retryTimesLeft = RETRY_TIMES;
 
-                // if (!IsTradingTime(share.shareData.dataTime)) continue;
-                lvi.SubItems[subitemIndex_Name].Text = share.shareData.shareName;
-                lvi.SubItems[subitemIndex_CurrentPrice].Text = share.shareData.currentPrice;
+                lvi.SubItems[subitemIndex_Name].Text = data.name;
+                lvi.SubItems[subitemIndex_CurrentPrice].Text = data.price;
                 if(lvi.SubItems[subitemIndex_CurrentPrice].Text != "")
                 {
                     int warningType = -1;
@@ -373,12 +348,12 @@ namespace TraderHelper
                         // Highlight warning item in listview
                         lvi.ForeColor = warningType == 0 ? Color.Red : Color.Green;
 
-                        if (!WarningMessageBox.isShareBind(share))
+                        if (!WarningMessageBox.isSecuritiesObjectBind(data))
                         {
                             // Wechat notify
                             int retry = 3;
-                            string title = "[" + share.shareInfo.shareUrlCode + "] " + share.shareData.shareName + " 触发" + (warningType == 0 ? "上" : "下") + "破价格 " + (warningType == 0 ? lvi.SubItems[subitemIndex_UpPrice].Text : lvi.SubItems[subitemIndex_DownPrice].Text);
-                            string content = title + ", 现价 " + share.shareData.currentPrice;
+                            string title = "[" + data.code + "] " + data.name + " 触发" + (warningType == 0 ? "上" : "下") + "破价格 " + (warningType == 0 ? lvi.SubItems[subitemIndex_UpPrice].Text : lvi.SubItems[subitemIndex_DownPrice].Text);
+                            string content = title + ", 现价 " + data.price;
                             WechatNotifier wechatNotifier = new WechatNotifier(Notify_SCKEY);
                             if (wechatNotify.Checked)
                             {
@@ -408,11 +383,11 @@ namespace TraderHelper
                                     warrow = "↓";
                                     wprice = lvi.SubItems[subitemIndex_DownPrice].Text;
                                 }
-                                Helper.HttpResponseStream(pushdeerBaseUrl + @"pushkey=" + Notify_PUSHKEY + "&text=[" + share.shareInfo.shareUrlCode + "] " + share.shareData.shareName + " " + wdirection + " " + wprice +  " " + warrow);
+                                http.HttpResponseStream(pushdeerBaseUrl + @"pushkey=" + Notify_PUSHKEY + "&text=[" + data.code + "] " + data.name + " " + wdirection + " " + wprice + " " + warrow, (req) => { });
                             }
 
                             // Create Warning Messagebox
-                            WarningMessageBox msg = new WarningMessageBox(share, warningType, (warningType == 0 ? lvi.SubItems[subitemIndex_UpPrice].Text : lvi.SubItems[subitemIndex_DownPrice].Text), this);
+                            WarningMessageBox msg = new WarningMessageBox(data, warningType, (warningType == 0 ? lvi.SubItems[subitemIndex_UpPrice].Text : lvi.SubItems[subitemIndex_DownPrice].Text), this);
                             msg.Show();
                         }
 
@@ -424,7 +399,7 @@ namespace TraderHelper
             }
 
             // Update Infomation Panal
-            if (await Get2DisplayShareInfomationByCode(textBox_StockCode.Text))
+            if (Get2DisplayShareInfomationByCode(textBox_StockCode.Text))
                 this.Text = Formtitle + " (Stock data has update: " + System.DateTime.Now.ToLongDateString() + " " + System.DateTime.Now.ToLongTimeString() + " )";
             else
             { 
@@ -445,14 +420,14 @@ namespace TraderHelper
                 notifyIcon1.Text = "当前有" + String.Concat(bindCount) + "条预警被触发!";
         }
 
-        private async void textBox1_TextChanged(object sender, EventArgs e)
+        private void textBox1_TextChanged(object sender, EventArgs e)
         {
             if(textBox_StockCode.TextLength == 6)
             {
                 string code = textBox_StockCode.Text;
                 UpdateButtonType();
                 textBox_StockCode.ForeColor = Color.Black;
-                UpDownPriceConfigPanal.Enabled = await Get2DisplayShareInfomationByCode(code, true);
+                UpDownPriceConfigPanal.Enabled = Get2DisplayShareInfomationByCode(code, true);
             }
             else
             {
@@ -466,7 +441,7 @@ namespace TraderHelper
         {
             string code = textBox_StockCode.Text;
 
-            if (Helper.isStockCodeExistList(code, stockListFilePath))   buttonType = 1;
+            if (helper.isStockCodeExistList(code, stockListFilePath))   buttonType = 1;
             else buttonType = 0;
 
             button_StockListItemOperate.Text = buttonTypeText[buttonType];
@@ -485,7 +460,7 @@ namespace TraderHelper
             listView_StockList.Items.AddRange(new ListViewItem[] { lvi_1 });
         }
 
-        private async void UpdateStockList(bool write = false)
+        private void UpdateStockList(bool write = false)
         {
             if(write)
             {
@@ -498,7 +473,7 @@ namespace TraderHelper
                 return;
             }
             listView_StockList.Items.Clear();
-            await Get2DisplayStockList();
+            Get2DisplayStockList();
             UpdatePriceSetting();
         }
 
@@ -507,9 +482,9 @@ namespace TraderHelper
             string tarCode = textBox_StockCode.Text;
             if(buttonType == 0) // Add to list
             {
-                if (Helper.isStockCodeExistList(tarCode, stockListFilePath)) return;
+                if (helper.isStockCodeExistList(tarCode, stockListFilePath)) return;
 
-                using (System.IO.StreamWriter streamWriter = new System.IO.StreamWriter(stockListFilePath, true))
+                using (StreamWriter streamWriter = new StreamWriter(stockListFilePath, true))
                 {
                     streamWriter.WriteLine(textBox_StockCode.Text);
                 }
@@ -530,8 +505,6 @@ namespace TraderHelper
 
         private void UpdatePriceSetting(bool write = false)
         {
-            // throw new NotImplementedException();
-
             if(write)
             {
                 string output = "";
@@ -560,9 +533,9 @@ namespace TraderHelper
                 {
                     string[] config = stremReader.ReadToEnd().Split('\n');
                     if (config.Length < 2) return;
-                    System.Text.RegularExpressions.Match result = Helper.Regexer_Ex("(?<={).+(?=})", config[0]);
+                    System.Text.RegularExpressions.Match result = helper.Regexer_Ex("(?<={).+(?=})", config[0]);
                     string upPrice = result.Value.ToString();
-                    result = Helper.Regexer_Ex("(?<={).+(?=})", config[1]);
+                    result = helper.Regexer_Ex("(?<={).+(?=})", config[1]);
                     string downPrice = result.ToString();
                     lvi.SubItems[subitemIndex_UpPrice].Text = upPrice;
                     lvi.SubItems[subitemIndex_DownPrice].Text = downPrice;
@@ -570,12 +543,12 @@ namespace TraderHelper
             }
         }
 
-        private async void button_PriceSettingConfirm_Click(object sender, EventArgs e)
+        private void button_PriceSettingConfirm_Click(object sender, EventArgs e)
         {
             int index = currentIndex;
             string code = listView_StockList.Items[index].Text;
-            Share share = await GetShareByCode(code);
-            string currentPrice = share.shareData.currentPrice;
+            SecuritiesData data = dataSource.GetData(code);
+            string currentPrice = data.price;
             string upPrice = textBox_PriceSettingUp.Text;
             string downPrice = textBox_PriceSettingDown.Text;
             if ((upPrice != "" && float.Parse(upPrice) <= float.Parse(currentPrice)) || (downPrice != "" && float.Parse(downPrice) >= float.Parse(currentPrice)))
@@ -586,7 +559,6 @@ namespace TraderHelper
             listView_StockList.Items[index].SubItems[subitemIndex_UpPrice].Text = upPrice;
             listView_StockList.Items[index].SubItems[subitemIndex_DownPrice].Text = downPrice;
 
-            // save to file (Implement later)
             UpdatePriceSetting(true);
         }
 
@@ -698,6 +670,31 @@ namespace TraderHelper
                 MessageBox.Show("要开启 PushDeer 提醒，请先在配置文件 [pushdeer.ini] 中写入 KEY。\n请在弹出的" + (pngExist ? "图片" : "网页") + "中使用 iOS14+ 自带相机扫码，在弹出的轻应用中输入 URL 为：http://notify.houkaifa.com，\n然后登录绑定，得到用于通知的 Key。\n轻应用若30天未使用需要重新更新授权，故若长期使用请扫码后在弹出的卡片底部进入 App Store 下载使用。\n安卓版请前往：https://github.com/easychen/pushdeer/releases 下载。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
             }
 
+        }
+
+        private void dataSourceComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string selectionName = defaultDataSourceSelection;
+            switch(dataSourceComboBox.SelectedIndex)
+            {
+                case 0:
+                    selectionName = UseDataSource(common.Source.TENCENT.ToString()).ToString();
+                    //dataSource = staging.datasource.DataSourceImp.New(common.Source.TENCENT);
+                    break;
+                case 1:
+                    selectionName = UseDataSource(common.Source.SINA.ToString()).ToString();
+                    break;
+                case 2:
+                    selectionName = UseDataSource(common.Source.EASTMONEY.ToString()).ToString();
+                    break;
+                default:
+                    selectionName = UseDataSource(null).ToString();
+                    break;
+            }
+            using(StreamWriter writer = new StreamWriter(dataSourceSelectionPath))
+            {
+                writer.WriteLine(selectionName);
+            }
         }
     }
 }

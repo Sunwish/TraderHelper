@@ -55,22 +55,36 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="api\DataSource.cs" />
+    <Compile Include="api\Formatter.cs" />
+    <Compile Include="api\UrlBuilder.cs" />
+    <Compile Include="common\common.cs" />
+    <Compile Include="common\http.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="staging\datasource\DataSourceImp.cs" />
+    <Compile Include="staging\datasource\sina\EastmoneyDataSource.cs" />
+    <Compile Include="staging\datasource\sina\SinaDataSource.cs" />
+    <Compile Include="staging\datasource\sina\TencentDataSource.cs" />
+    <Compile Include="staging\formatter\EastmoneyDataFormatter.cs" />
+    <Compile Include="staging\formatter\SinaDataFormatter.cs" />
+    <Compile Include="staging\formatter\TencentDataFormatter.cs" />
+    <Compile Include="staging\urlbuilder\EastmoneyUrlBuilder.cs" />
+    <Compile Include="staging\urlbuilder\TencentUrlBuilder.cs" />
+    <Compile Include="staging\urlbuilder\SinaUrlBuilder.cs" />
     <Compile Include="WarningMessageBox.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="WarningMessageBox.Designer.cs">
       <DependentUpon>WarningMessageBox.cs</DependentUpon>
     </Compile>
-    <Compile Include="Helper.cs" />
+    <Compile Include="common\helper.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Share.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -105,6 +119,7 @@
     <Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="bin\Debug\warning.wav" />
     <Content Include="DEFAULT_ICON.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -9,26 +9,28 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows;
 using System.Collections;
+using TraderHelper.common;
+using System.CodeDom;
 
 namespace TraderHelper
 {
     partial class WarningMessageBox : Form
     {
-        Share bindShare;
+        SecuritiesData bindSecuritiesObject;
         static ArrayList bindCode = new ArrayList();
         string warningPrice;
         int warningType;
         Form1 mainWindow;
-        public WarningMessageBox(Share bindShare, int warningType/* 0.UpWarning, 1.DownWarning, 2.Exception */, string warningPrice, Form1 mainWindow)
+        public WarningMessageBox(SecuritiesData securitiesObject, int warningType/* 0.UpWarning, 1.DownWarning, 2.Exception */, string warningPrice, Form1 mainWindow)
         {
             // Add share to bind list
-            bindCode.Add(bindShare.shareInfo.shareUrlCode);
+            bindCode.Add(securitiesObject.code);
 
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.TopMost = true;
-            this.bindShare = bindShare;
+            this.bindSecuritiesObject = securitiesObject;
             this.warningPrice = warningPrice;
             this.warningType = warningType;
             this.mainWindow = mainWindow;
@@ -37,7 +39,7 @@ namespace TraderHelper
 
         private void WarningMessageBox_Load(object sender, EventArgs e)
         {
-            label_WarningText.Text = "[" + bindShare.shareInfo.shareUrlCode + "] " + bindShare.shareData.shareName + " 触发" + (warningType == 0 ? "上" : "下") + "破价格 " + warningPrice + "，现价 " + bindShare.shareData.currentPrice;
+            label_WarningText.Text = "[" + bindSecuritiesObject.code + "] " + bindSecuritiesObject.name + " 触发" + (warningType == 0 ? "上" : "下") + "破价格 " + warningPrice + "，现价 " + bindSecuritiesObject.price;
             if (warningType == 0)
                 label_WarningText.ForeColor = Color.Red;
             else if (warningType == 1)
@@ -53,12 +55,12 @@ namespace TraderHelper
         private void WarningMessageBox_FormClosing(object sender, FormClosingEventArgs e)
         {
             // Remove share from bind list
-            bindCode.Remove(bindShare.shareInfo.shareUrlCode);
+            bindCode.Remove(bindSecuritiesObject.code);
         }
 
-        public static bool isShareBind(Share share)
+        public static bool isSecuritiesObjectBind(SecuritiesData data)
         {
-            return bindCode.IndexOf(share.shareInfo.shareUrlCode) != -1;
+            return bindCode.IndexOf(data.code) != -1;
         }
 
         public static int getBindCount()

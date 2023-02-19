@@ -25,7 +25,7 @@ namespace TraderHelper.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1.2.3")]
+        [global::System.Configuration.DefaultSettingValueAttribute("2.0.0")]
         public string version {
             get {
                 return ((string)(this["version"]));
